@@ -1,7 +1,14 @@
+#include <fstream>
+
 #include "Game.h"
 #include "debug.h"
+#include "Utils.h"
 
-CGame * CGame::__instance = NULL;
+#include "Texture.h"
+#include "Animations.h"
+#include "PlayScene.h"
+
+CGame* CGame::__instance = NULL;
 
 /*
 	Initialize DirectX, create a Direct3D device for rendering within the window, initial Sprite library for
@@ -91,7 +98,7 @@ void CGame::Init(HWND hWnd, HINSTANCE hInstance)
 	//
 	//
 
-	D3D10_SAMPLER_DESC desc; 
+	D3D10_SAMPLER_DESC desc;
 	desc.Filter = D3D10_FILTER_MIN_MAG_POINT_MIP_LINEAR;
 	desc.AddressU = D3D10_TEXTURE_ADDRESS_CLAMP;
 	desc.AddressV = D3D10_TEXTURE_ADDRESS_CLAMP;
@@ -160,12 +167,12 @@ void CGame::SetPointSamplerState()
 	NOTE: This function is very inefficient because it has to convert
 	from texture to sprite every time we need to draw it
 */
-void CGame::Draw(float x, float y, LPTEXTURE tex, RECT* rect, float alpha)
+void CGame::Draw(float x, float y, LPTEXTURE tex, RECT* rect, float alpha, int sprite_width, int sprite_height)
 {
 	if (tex == NULL) return;
 
-	int spriteWidth = 0;
-	int spriteHeight = 0;
+	int spriteWidth = sprite_width;
+	int spriteHeight = sprite_height;
 
 	D3DX10_SPRITE sprite;
 
@@ -182,16 +189,16 @@ void CGame::Draw(float x, float y, LPTEXTURE tex, RECT* rect, float alpha)
 		sprite.TexSize.x = 1.0f;
 		sprite.TexSize.y = 1.0f;
 
-		spriteWidth = tex->getWidth();
-		spriteHeight = tex->getHeight();
+		if (spriteWidth == 0) spriteWidth = tex->getWidth();
+		if (spriteHeight == 0) spriteHeight = tex->getHeight();
 	}
 	else
 	{
 		sprite.TexCoord.x = rect->left / (float)tex->getWidth();
 		sprite.TexCoord.y = rect->top / (float)tex->getHeight();
 
-		spriteWidth = (rect->right - rect->left + 1);
-		spriteHeight = (rect->bottom - rect->top + 1);
+		if (spriteWidth == 0) spriteWidth = (rect->right - rect->left + 1);
+		if (spriteHeight == 0) spriteHeight = (rect->bottom - rect->top + 1);
 
 		sprite.TexSize.x = spriteWidth / (float)tex->getWidth();
 		sprite.TexSize.y = spriteHeight / (float)tex->getHeight();
@@ -242,7 +249,7 @@ LPTEXTURE CGame::LoadTexture(LPCWSTR texturePath)
 		return NULL;
 	}
 
-	D3DX10_IMAGE_LOAD_INFO info; 
+	D3DX10_IMAGE_LOAD_INFO info;
 	ZeroMemory(&info, sizeof(D3DX10_IMAGE_LOAD_INFO));
 	info.Width = imageInfo.Width;
 	info.Height = imageInfo.Height;
@@ -316,7 +323,7 @@ int CGame::IsKeyDown(int KeyCode)
 	return (keyStates[KeyCode] & 0x80) > 0;
 }
 
-void CGame::InitKeyboard(LPKEYEVENTHANDLER handler)
+void CGame::InitKeyboard()
 {
 	HRESULT hr = DirectInput8Create(this->hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (VOID**)&di, NULL);
 	if (hr != DI_OK)
@@ -371,8 +378,6 @@ void CGame::InitKeyboard(LPKEYEVENTHANDLER handler)
 		return;
 	}
 
-	this->keyHandler = handler;
-
 	DebugOut(L"[INFO] Keyboard has been initialized successfully\n");
 }
 
@@ -422,6 +427,120 @@ void CGame::ProcessKeyboard()
 		else
 			keyHandler->OnKeyUp(KeyCode);
 	}
+}
+
+#define MAX_GAME_LINE 1024
+
+
+#define GAME_FILE_SECTION_UNKNOWN -1
+#define GAME_FILE_SECTION_SETTINGS 1
+#define GAME_FILE_SECTION_SCENES 2
+#define GAME_FILE_SECTION_TEXTURES 3
+
+
+void CGame::_ParseSection_SETTINGS(string line)
+{
+	vector<string> tokens = split(line);
+
+	if (tokens.size() < 2) return;
+	if (tokens[0] == "start")
+		next_scene = atoi(tokens[1].c_str());
+	else
+		DebugOut(L"[ERROR] Unknown game setting: %s\n", ToWSTR(tokens[0]).c_str());
+}
+
+void CGame::_ParseSection_SCENES(string line)
+{
+	vector<string> tokens = split(line);
+
+	if (tokens.size() < 2) return;
+	int id = atoi(tokens[0].c_str());
+	LPCWSTR path = ToLPCWSTR(tokens[1]);   // file: ASCII format (single-byte char) => Wide Char
+
+	LPSCENE scene = new CPlayScene(id, path);
+	scenes[id] = scene;
+}
+
+/*
+	Load game campaign file and load/initiate first scene
+*/
+void CGame::Load(LPCWSTR gameFile)
+{
+	DebugOut(L"[INFO] Start loading game file : %s\n", gameFile);
+
+	ifstream f;
+	f.open(gameFile);
+	char str[MAX_GAME_LINE];
+
+	// current resource section flag
+	int section = GAME_FILE_SECTION_UNKNOWN;
+
+	while (f.getline(str, MAX_GAME_LINE))
+	{
+		string line(str);
+
+		if (line[0] == '#') continue;	// skip comment lines	
+
+		if (line == "[SETTINGS]") { section = GAME_FILE_SECTION_SETTINGS; continue; }
+		if (line == "[TEXTURES]") { section = GAME_FILE_SECTION_TEXTURES; continue; }
+		if (line == "[SCENES]") { section = GAME_FILE_SECTION_SCENES; continue; }
+		if (line[0] == '[')
+		{
+			section = GAME_FILE_SECTION_UNKNOWN;
+			DebugOut(L"[ERROR] Unknown section: %s\n", ToLPCWSTR(line));
+			continue;
+		}
+
+		//
+		// data section
+		//
+		switch (section)
+		{
+		case GAME_FILE_SECTION_SETTINGS: _ParseSection_SETTINGS(line); break;
+		case GAME_FILE_SECTION_SCENES: _ParseSection_SCENES(line); break;
+		case GAME_FILE_SECTION_TEXTURES: _ParseSection_TEXTURES(line); break;
+		}
+	}
+	f.close();
+
+	DebugOut(L"[INFO] Loading game file : %s has been loaded successfully\n", gameFile);
+
+	SwitchScene();
+}
+
+void CGame::SwitchScene()
+{
+	if (next_scene < 0 || next_scene == current_scene) return;
+
+	DebugOut(L"[INFO] Switching to scene %d\n", next_scene);
+
+	scenes[current_scene]->Unload();
+
+	CSprites::GetInstance()->Clear();
+	CAnimations::GetInstance()->Clear();
+
+	current_scene = next_scene;
+	LPSCENE s = scenes[next_scene];
+	this->SetKeyHandler(s->GetKeyEventHandler());
+	s->Load();
+}
+
+void CGame::InitiateSwitchScene(int scene_id)
+{
+	next_scene = scene_id;
+}
+
+
+void CGame::_ParseSection_TEXTURES(string line)
+{
+	vector<string> tokens = split(line);
+
+	if (tokens.size() < 2) return;
+
+	int texID = atoi(tokens[0].c_str());
+	wstring path = ToWSTR(tokens[1]);
+
+	CTextures::GetInstance()->Add(texID, path.c_str());
 }
 
 

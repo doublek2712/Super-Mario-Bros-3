@@ -19,6 +19,7 @@ CTextures* CTextures::GetInstance()
 
 void CTextures::Add(int id, LPCWSTR filePath)
 {
+	DebugOut(L"[INFO] Add texture from file : %s\n", filePath);
 	textures[id] = CGame::GetInstance()->LoadTexture(filePath);
 }
 
@@ -27,5 +28,18 @@ LPTEXTURE CTextures::Get(unsigned int i)
 	return textures[i];
 }
 
+/*
+	Clear all loaded textures
+*/
+void CTextures::Clear()
+{
+	for (auto x : textures)
+	{
+		LPTEXTURE tex = x.second;
+		if (tex != NULL) delete tex;
+	}
+
+	textures.clear();
+}
 
 
