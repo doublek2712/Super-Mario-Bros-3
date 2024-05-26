@@ -1,6 +1,7 @@
 #include <Windows.h>
 
 #include "Utils.h"
+#include "Configs.h"
 
 vector<string> split(string line, string delimeter)
 {
@@ -50,4 +51,11 @@ LPCWSTR ToLPCWSTR(string st)
 
 	// delete wcstring   // << can I ? 
 	return w->c_str();
+}
+/*
+*	Convert coordinates on grid to real coordinates
+*/
+void gridToreal(float& x, float& y) {
+	x = x * GRID_SIZE + BG_WIDTH_BUFFER;
+	y = y * GRID_SIZE + BG_HEIGHT_BUFFER;
 }
