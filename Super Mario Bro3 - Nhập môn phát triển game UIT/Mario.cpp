@@ -7,6 +7,7 @@
 #include "Goomba.h"
 #include "Coin.h"
 #include "Portal.h"
+#include "Block.h"
 
 #include "Collision.h"
 
@@ -54,6 +55,20 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithCoin(e);
 	else if (dynamic_cast<CPortal*>(e->obj))
 		OnCollisionWithPortal(e);
+	else if (dynamic_cast<CBlock*>(e->obj))
+		OnCollisionWithQBlock(e);
+}
+void CMario::OnCollisionWithQBlock(LPCOLLISIONEVENT e) {
+	CBlock* block = dynamic_cast<CBlock*>(e->obj);
+	//jump from below the block
+	if(e->ny > 0)
+	{ 
+		if (block->GetState() == BLOCK_STATE_EMPTY)
+			return;
+		if (block->GetState() == BLOCK_STATE_IDLE) {
+			block->SetState(BLOCK_STATE_COLLIDED);
+		}
+	}
 }
 
 void CMario::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
@@ -241,7 +256,7 @@ void CMario::Render()
 
 	//RenderBoundingBox();
 
-	DebugOutTitle(L"Coins: %d. x = %f, y = %f", coin, x, y);
+	//DebugOutTitle(L"Coins: %d. x = %f, y = %f", coin, x, y);
 }
 
 void CMario::SetState(int state)

@@ -6,17 +6,34 @@
 #include "Configs.h"
 #include "debug.h"
 
-#define ID_ANI_BRICK 10000
+#define ID_ANI_Q_BLOCK 10000
+#define ID_ANI_EMPTY_BLOCK 10001
+
+#define BLOCK_STATE_IDLE 0
+#define BLOCK_STATE_COLLIDED 1
+#define BLOCK_STATE_EMPTY 2
+
 #define BRICK_WIDTH 16
-#define BRICK_BBOX_WIDTH 16
-#define BRICK_BBOX_HEIGHT 16
+#define BLOCK_BBOX_WIDTH 16
+#define BLOCK_BBOX_HEIGHT 16
+
+#define BLOCK_BOUNCE_FORCE 0.3f
+#define BLOCK_BOUNCE_RECURE 0.008f
 
 class CBlock : public CGameObject {
+	float def_x, def_y;
+
 public:
 	CBlock(float x, float y) : CGameObject(x,y) {
+		this->state = BLOCK_STATE_IDLE;
+		def_x = x;
+		def_y = y;
 	}
 
 	void Render();
-	void Update(DWORD dt) {}
+	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	void GetBoundingBox(float& l, float& t, float& r, float& b);
+
+	void SetState(int state);
+	//int IsBlocking() { return (state == BLOCK_STATE_EMPTY); }
 };
