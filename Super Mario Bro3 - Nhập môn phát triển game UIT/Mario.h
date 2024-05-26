@@ -87,15 +87,16 @@
 
 #define	MARIO_LEVEL_SMALL	1
 #define	MARIO_LEVEL_BIG		2
+#define MARIO_LEVEL_RACCOON	3
 
-#define MARIO_BIG_BBOX_WIDTH  14
+#define MARIO_BIG_BBOX_WIDTH  8
 #define MARIO_BIG_BBOX_HEIGHT 24
-#define MARIO_BIG_SITTING_BBOX_WIDTH  14
+#define MARIO_BIG_SITTING_BBOX_WIDTH  8
 #define MARIO_BIG_SITTING_BBOX_HEIGHT 16
 
 #define MARIO_SIT_HEIGHT_ADJUST ((MARIO_BIG_BBOX_HEIGHT-MARIO_BIG_SITTING_BBOX_HEIGHT)/2)
 
-#define MARIO_SMALL_BBOX_WIDTH  13
+#define MARIO_SMALL_BBOX_WIDTH  7
 #define MARIO_SMALL_BBOX_HEIGHT 12
 
 
@@ -151,6 +152,7 @@ public:
 	void OnCollisionWith(LPCOLLISIONEVENT e);
 
 	void SetLevel(int l);
+	int GetLevel();
 	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount64(); }
 
 	void GetBoundingBox(float& left, float& top, float& right, float& bottom);

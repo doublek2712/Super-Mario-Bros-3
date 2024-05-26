@@ -1,4 +1,6 @@
 #include "Block.h"
+#include "PlayScene.h"
+#include "Mario.h"
 #include "Configs.h"
 #include "debug.h"
 
@@ -14,7 +16,6 @@ void CBlock::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects) {
 		vy += BLOCK_BOUNCE_RECURE * dt;
 	}
 
-	DebugOutTitle(L"Block[x=%f,y=%f]", x, y);
 }
 void CBlock::Render()
 {
@@ -28,7 +29,7 @@ void CBlock::Render()
 
 	animations->Get(aniId)->Render(x,y);
 
-	RenderBoundingBox();
+	//RenderBoundingBox();
 }
 
 void CBlock::GetBoundingBox(float &l, float &t, float &r, float &b)
@@ -43,8 +44,11 @@ void CBlock::SetState(int state) {
 	if (this->state == BLOCK_STATE_EMPTY) return;
 	switch (state) {
 	case BLOCK_STATE_COLLIDED:
+	{
 		vy = -BLOCK_BOUNCE_FORCE;
+		item->SetState(CONTAINED_STATE_ACTIVE);
 		break;
+	}
 	case BLOCK_STATE_EMPTY:
 		break;
 	}

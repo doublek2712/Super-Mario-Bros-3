@@ -15,6 +15,7 @@
 #include "Block.h"
 #include "BackgroundElement.h"
 #include "Mario.h"
+#include "SuperLeaf.h"
 
 #include "SampleKeyEventHandler.h"
 
@@ -144,6 +145,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	float y = (float)atof(tokens[2].c_str());
 
 	CGameObject* obj = NULL;
+	CGameObject* tmp = NULL;
 
 	switch (object_type)
 	{
@@ -159,10 +161,23 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		DebugOut(L"[INFO] Player object has been created!\n");
 		break;
 	case OBJECT_TYPE_GOOMBA: obj = new CGoomba(x, y); break;
-	case OBJECT_TYPE_BRICK: 
+	case OBJECT_TYPE_BLOCK:
+	{	
 		gridToreal(x, y);
-		obj = new CBlock(x, y); 
+		int type = atoi(tokens[3].c_str());
+		switch (type) {
+		case CONTAIN_COIN:
+			tmp = new CBouncingCoin(x, y - GRID_SIZE);
+			break;
+		case CONTAIN_SUPER_LEAF:
+			tmp = new CSuperLeaf(x, y - GRID_SIZE);
+			break;
+		}
+		
+		objects.push_back(tmp);
+		obj = new CBlock(x, y, type, tmp);
 		break;
+	}
 	case OBJECT_TYPE_COIN: obj = new CCoin(x, y); break;
 
 	case OBJECT_TYPE_PLATFORM:
@@ -199,7 +214,6 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 		break;
 	}
-
 	case OBJECT_TYPE_PORTAL:
 	{
 		float r = (float)atof(tokens[3].c_str());

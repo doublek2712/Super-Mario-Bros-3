@@ -1,0 +1,4 @@
+#pragma once
+
+#define CONTAINED_STATE_DEACTIVE 0
+#define CONTAINED_STATE_ACTIVE 1

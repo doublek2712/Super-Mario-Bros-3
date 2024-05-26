@@ -149,12 +149,14 @@
     <ClInclude Include="AssetIDs.h" />
     <ClInclude Include="BackgroundElement.h" />
     <ClInclude Include="Block.h" />
+    <ClInclude Include="BouncingCoin.h" />
     <ClInclude Include="Coin.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="Configs.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="GlobalState.h" />
     <ClInclude Include="Goomba.h" />
     <ClInclude Include="Ground.h" />
     <ClInclude Include="KeyEventHandler.h" />
@@ -165,6 +167,7 @@
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="Sprites.h" />
+    <ClInclude Include="SuperLeaf.h" />
     <ClInclude Include="SuperMushroom.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Textures.h" />
@@ -175,6 +178,7 @@
     <ClCompile Include="Animations.cpp" />
     <ClCompile Include="BackgroundElement.cpp" />
     <ClCompile Include="Block.cpp" />
+    <ClCompile Include="BouncingCoin.cpp" />
     <ClCompile Include="Coin.cpp" />
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="debug.cpp" />
@@ -190,6 +194,7 @@
     <ClCompile Include="SampleKeyEventHandler.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="Sprites.cpp" />
+    <ClCompile Include="SuperLeaf.cpp" />
     <ClCompile Include="SuperMushroom.cpp" />
     <ClCompile Include="Textures.cpp" />
     <ClCompile Include="Utils.cpp" />

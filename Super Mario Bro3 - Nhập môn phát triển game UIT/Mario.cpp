@@ -357,6 +357,7 @@ void CMario::GetBoundingBox(float& left, float& top, float& right, float& bottom
 			right = left + MARIO_BIG_BBOX_WIDTH;
 			bottom = top + MARIO_BIG_BBOX_HEIGHT;
 		}
+
 	}
 	else
 	{
@@ -375,5 +376,10 @@ void CMario::SetLevel(int l)
 		y -= (MARIO_BIG_BBOX_HEIGHT - MARIO_SMALL_BBOX_HEIGHT) / 2;
 	}
 	level = l;
+}
+
+int CMario::GetLevel()
+{
+	return this->level;
 }
 
