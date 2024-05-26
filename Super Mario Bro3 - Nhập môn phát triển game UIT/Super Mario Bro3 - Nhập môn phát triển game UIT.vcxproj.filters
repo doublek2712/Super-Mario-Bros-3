@@ -22,9 +22,6 @@
     <Filter Include="Header Files\Utilities">
       <UniqueIdentifier>{e32b6e09-511d-45ad-b50b-473b8260a48c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\_IDs">
-      <UniqueIdentifier>{616370ec-75eb-44f8-a2f6-73debb781782}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Framework of God">
       <UniqueIdentifier>{ddc636e9-d36f-4caf-8644-fba023ccea15}</UniqueIdentifier>
     </Filter>
@@ -33,6 +30,9 @@
     </Filter>
     <Filter Include="Source Files\Utilities">
       <UniqueIdentifier>{dc495157-824c-4239-b5a8-75c634c2cf3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Defines">
+      <UniqueIdentifier>{616370ec-75eb-44f8-a2f6-73debb781782}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -73,7 +73,7 @@
       <Filter>Header Files\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="AssetIDs.h">
-      <Filter>Header Files\_IDs</Filter>
+      <Filter>Header Files\Defines</Filter>
     </ClInclude>
     <ClInclude Include="Collision.h">
       <Filter>Header Files\Framework of God</Filter>
@@ -81,7 +81,7 @@
     <ClInclude Include="SampleKeyEventHandler.h">
       <Filter>Header Files\Framework of God</Filter>
     </ClInclude>
-    <ClInclude Include="Brick.h">
+    <ClInclude Include="Block.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
     <ClInclude Include="Coin.h">
@@ -107,6 +107,15 @@
     </ClInclude>
     <ClInclude Include="Utils.h">
       <Filter>Header Files\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Ground.h">
+      <Filter>Header Files\Game Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="BackgroundElement.h">
+      <Filter>Header Files\Framework of God</Filter>
+    </ClInclude>
+    <ClInclude Include="Configs.h">
+      <Filter>Header Files\Defines</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -140,7 +149,7 @@
     <ClCompile Include="Textures.cpp">
       <Filter>Source Files\Framework of God</Filter>
     </ClCompile>
-    <ClCompile Include="Brick.cpp">
+    <ClCompile Include="Block.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
     <ClCompile Include="Coin.cpp">
@@ -171,6 +180,9 @@
       <Filter>Source Files\Utilities</Filter>
     </ClCompile>
     <ClCompile Include="Portal.cpp">
+      <Filter>Source Files\Framework of God</Filter>
+    </ClCompile>
+    <ClCompile Include="BackgroundElement.cpp">
       <Filter>Source Files\Framework of God</Filter>
     </ClCompile>
   </ItemGroup>

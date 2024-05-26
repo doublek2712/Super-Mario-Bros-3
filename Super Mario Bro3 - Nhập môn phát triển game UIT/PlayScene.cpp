@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include "AssetIDs.h"
+#include "Configs.h"
+#include "debug.h"
 
 #include "PlayScene.h"
 #include "Utils.h"
@@ -9,8 +11,15 @@
 #include "Portal.h"
 #include "Coin.h"
 #include "Platform.h"
+#include "Ground.h"
+#include "Block.h"
+#include "BackgroundElement.h"
+#include "Mario.h"
 
 #include "SampleKeyEventHandler.h"
+
+#define BG_ELEMENT_WIDTH 16
+#define BG_ELEMENT_HEIGHT 16
 
 using namespace std;
 
@@ -25,6 +34,8 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 #define SCENE_SECTION_UNKNOWN -1
 #define SCENE_SECTION_ASSETS	1
 #define SCENE_SECTION_OBJECTS	2
+#define SCENE_SECTION_BACKGROUND	3
+#define SCENE_SECTION_BOUNDARIES	4
 
 #define ASSETS_SECTION_UNKNOWN -1
 #define ASSETS_SECTION_SPRITES 1
@@ -64,6 +75,37 @@ void CPlayScene::_ParseSection_ASSETS(string line)
 	wstring path = ToWSTR(tokens[0]);
 
 	LoadAssets(path.c_str());
+}
+
+void CPlayScene::_ParseSection_BACKGROUND(string line)
+{
+	vector<string> tokens = split(line);
+
+	if (tokens.size() < 5) return; // skip invalid lines
+
+	int x = atoi(tokens[0].c_str());
+	int y = atoi(tokens[1].c_str());
+	int row = atoi(tokens[2].c_str());
+	int col = atoi(tokens[3].c_str());
+	int spriteID = atoi(tokens[4].c_str());
+
+	LPBGELEMENT element = new CBackgroundElement(x, y, row, col, spriteID);
+	
+	this->background.push_back(element);
+}
+
+void CPlayScene::_ParseSection_BOUNDARIES(string line)
+{
+	vector<string> tokens = split(line);
+
+	if (tokens.size() < 4) return; // skip invalid lines
+
+	b_left = atoi(tokens[0].c_str());
+	b_top = atoi(tokens[1].c_str());
+	b_right = atoi(tokens[2].c_str());
+	b_bottom = atoi(tokens[3].c_str());
+
+
 }
 
 void CPlayScene::_ParseSection_ANIMATIONS(string line)
@@ -117,22 +159,41 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		DebugOut(L"[INFO] Player object has been created!\n");
 		break;
 	case OBJECT_TYPE_GOOMBA: obj = new CGoomba(x, y); break;
-	case OBJECT_TYPE_BRICK: obj = new CBrick(x, y); break;
+	case OBJECT_TYPE_BRICK: 
+		gridToreal(x, y);
+		obj = new CBlock(x, y); 
+		break;
 	case OBJECT_TYPE_COIN: obj = new CCoin(x, y); break;
 
 	case OBJECT_TYPE_PLATFORM:
 	{
+		gridToreal(x, y);
 
-		float cell_width = (float)atof(tokens[3].c_str());
-		float cell_height = (float)atof(tokens[4].c_str());
-		int length = atoi(tokens[5].c_str());
-		int sprite_begin = atoi(tokens[6].c_str());
-		int sprite_middle = atoi(tokens[7].c_str());
-		int sprite_end = atoi(tokens[8].c_str());
+		int length = atoi(tokens[3].c_str());
+		int sprite_begin = atoi(tokens[4].c_str());
+		int sprite_middle = atoi(tokens[5].c_str());
+		int sprite_end = atoi(tokens[6].c_str());
 
 		obj = new CPlatform(
 			x, y,
-			cell_width, cell_height, length,
+			length,
+			sprite_begin, sprite_middle, sprite_end
+		);
+
+		break;
+	}
+
+	case OBJECT_TYPE_GROUND:
+	{
+		gridToreal(x, y);
+		int length = atoi(tokens[3].c_str());
+		int sprite_begin = atoi(tokens[4].c_str());
+		int sprite_middle = atoi(tokens[5].c_str());
+		int sprite_end = atoi(tokens[6].c_str());
+
+		obj = new CGround(
+			x, y,
+			length,
 			sprite_begin, sprite_middle, sprite_end
 		);
 
@@ -145,9 +206,8 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		float b = (float)atof(tokens[4].c_str());
 		int scene_id = atoi(tokens[5].c_str());
 		obj = new CPortal(x, y, r, b, scene_id);
+		break;
 	}
-	break;
-
 
 	default:
 		DebugOut(L"[ERROR] Invalid object type: %d\n", object_type);
@@ -213,7 +273,9 @@ void CPlayScene::Load()
 
 		if (line[0] == '#') continue;	// skip comment lines	
 		if (line == "[ASSETS]") { section = SCENE_SECTION_ASSETS; continue; };
-		if (line == "[OBJECTS]") { section = SCENE_SECTION_OBJECTS; continue; };
+		if (line == "[OBJECTS]") { section = SCENE_SECTION_OBJECTS; continue; }; 
+		if (line == "[BACKGROUND]") { section = SCENE_SECTION_BACKGROUND; continue; };
+		if (line == "[BOUNDARIES]") { section = SCENE_SECTION_BOUNDARIES; continue; };
 		if (line[0] == '[') { section = SCENE_SECTION_UNKNOWN; continue; }
 
 		//
@@ -223,6 +285,8 @@ void CPlayScene::Load()
 		{
 		case SCENE_SECTION_ASSETS: _ParseSection_ASSETS(line); break;
 		case SCENE_SECTION_OBJECTS: _ParseSection_OBJECTS(line); break;
+		case SCENE_SECTION_BACKGROUND: _ParseSection_BACKGROUND(line); break;
+		case SCENE_SECTION_BOUNDARIES: _ParseSection_BOUNDARIES(line); break;
 		}
 	}
 
@@ -233,11 +297,11 @@ void CPlayScene::Load()
 
 void CPlayScene::Update(DWORD dt)
 {
-	// We know that Mario is the first object in the list hence we won't add him into the colliable object list
-	// TO-DO: This is a "dirty" way, need a more organized way 
+
 
 	vector<LPGAMEOBJECT> coObjects;
-	for (size_t i = 1; i < objects.size(); i++)
+	for (size_t i = 0; i < objects.size(); i++)
+		if(objects[i] != player)
 	{
 		coObjects.push_back(objects[i]);
 	}
@@ -254,19 +318,32 @@ void CPlayScene::Update(DWORD dt)
 	float cx, cy;
 	player->GetPosition(cx, cy);
 
-	CGame* game = CGame::GetInstance();
+	if (cx <= b_left*GRID_SIZE) {
+		player->SetPosition(b_left * GRID_SIZE, cy);
+		player->SetState(MARIO_STATE_IDLE);
+	}
+	if (cx >= b_right * GRID_SIZE) {
+		player->SetPosition(b_right * GRID_SIZE, cy);
+		player->SetState(MARIO_STATE_IDLE);
+	}
+
+	CGame* game = CGame::GetInstance();	
 	cx -= game->GetBackBufferWidth() / 2;
 	cy -= game->GetBackBufferHeight() / 2;
 
 	if (cx < 0) cx = 0;
 
-	CGame::GetInstance()->SetCamPos(cx, 0.0f /*cy*/);
+	CGame::GetInstance()->SetCamPos(min(cx, b_right*GRID_SIZE - (GRID_SIZE*16)), 0.0f /*cy*/);
 
 	PurgeDeletedObjects();
 }
 
 void CPlayScene::Render()
 {
+	// render background
+	for (int i = 0; i < background.size(); i++)
+		background[i]->Render();
+	// render obj
 	for (int i = 0; i < objects.size(); i++)
 		objects[i]->Render();
 }
@@ -287,16 +364,27 @@ void CPlayScene::Clear()
 /*
 	Unload scene
 
-	TODO: Beside objects, we need to clean up sprites, animations and textures as well
-
 */
 void CPlayScene::Unload()
 {
+	//clear objects
 	for (int i = 0; i < objects.size(); i++)
 		delete objects[i];
 
 	objects.clear();
+
+	//clear background
+	for (int i = 0; i < background.size(); i++)
+		delete	background[i];
+	background.clear();
+
 	player = NULL;
+
+	//clear assets
+	CAnimations::GetInstance()->Clear();
+	CSprites::GetInstance()->Clear();
+
+	
 
 	DebugOut(L"[INFO] Scene %d unloaded! \n", id);
 }

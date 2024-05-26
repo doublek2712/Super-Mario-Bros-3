@@ -13,7 +13,7 @@
 #include "Animations.h"
 
 #include "Mario.h"
-#include "Brick.h"
+#include "Block.h"
 #include "Goomba.h"
 #include "Coin.h"
 #include "Platform.h"
@@ -26,10 +26,10 @@
 #define MAIN_WINDOW_TITLE L"test"
 #define WINDOW_ICON_PATH L"mario.ico"
 
-#define BACKGROUND_COLOR D3DXCOLOR(156.0f/255, 252.0f/255, 240.0f/255, 0.0f)
+#define BACKGROUND_COLOR D3DXCOLOR(0.0f/255, 0.0f/255, 0.0f/255, 0.0f)
 
-#define SCREEN_WIDTH 272
-#define SCREEN_HEIGHT 256
+#define SCREEN_WIDTH (256 + 16)
+#define SCREEN_HEIGHT (240 + 16)
 
 LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -171,7 +171,8 @@ int WINAPI WinMain(
 	_In_ LPSTR lpCmdLine,
 	_In_ int nCmdShow
 ) {
-	HWND hWnd = CreateGameWindow(hInstance, nCmdShow, SCREEN_WIDTH, SCREEN_HEIGHT);
+	int titleBarHeight = GetSystemMetrics(SM_CYCAPTION);
+	HWND hWnd = CreateGameWindow(hInstance, nCmdShow, SCREEN_WIDTH, SCREEN_HEIGHT+ titleBarHeight);
 
 	SetDebugWindow(hWnd);
 
@@ -183,7 +184,8 @@ int WINAPI WinMain(
 	//IMPORTANT: this is the only place where a hardcoded file name is allowed ! 
 	game->Load(L"resources\\root.txt");
 
-	SetWindowPos(hWnd, 0, 0, 0, SCREEN_WIDTH * 2 , SCREEN_HEIGHT * 2 , SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
+	SetWindowPos(hWnd, 0, 0, 0, SCREEN_WIDTH * 2 , (SCREEN_HEIGHT + titleBarHeight) * 2 , SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
+
 
 	Run();
 
