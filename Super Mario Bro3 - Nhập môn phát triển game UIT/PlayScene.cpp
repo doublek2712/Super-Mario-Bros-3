@@ -16,6 +16,8 @@
 #include "BackgroundElement.h"
 #include "Mario.h"
 #include "SuperLeaf.h"
+#include "SuperMushroom.h"
+#include "Pipe.h"
 
 #include "SampleKeyEventHandler.h"
 
@@ -145,7 +147,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	float y = (float)atof(tokens[2].c_str());
 
 	CGameObject* obj = NULL;
-	CGameObject* tmp = NULL;
+
 
 	switch (object_type)
 	{
@@ -165,17 +167,24 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	{	
 		gridToreal(x, y);
 		int type = atoi(tokens[3].c_str());
+		CGameObject* tmp = NULL;
 		switch (type) {
 		case CONTAIN_COIN:
 			tmp = new CBouncingCoin(x, y - GRID_SIZE);
 			break;
 		case CONTAIN_SUPER_LEAF:
-			tmp = new CSuperLeaf(x, y - GRID_SIZE);
+			CSuperMushroom* tmp2 = new CSuperMushroom(x, y );
+			objects.push_back(tmp2);
+			tmp = new CSuperLeaf(x, y - GRID_SIZE, tmp2);
+			tmp2 = NULL;
+			delete tmp2;
 			break;
 		}
 		
 		objects.push_back(tmp);
 		obj = new CBlock(x, y, type, tmp);
+		tmp = NULL;
+		delete tmp;
 		break;
 	}
 	case OBJECT_TYPE_COIN: obj = new CCoin(x, y); break;
@@ -214,6 +223,17 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 		break;
 	}
+	case OBJECT_TYPE_PIPE:
+	{
+		gridToreal(x, y);
+		int dir = atoi(tokens[3].c_str());
+		int flip = atoi(tokens[4].c_str());
+		int length = atoi(tokens[5].c_str());
+
+		obj = new CPipe(x, y, dir, flip, length);
+		break;
+	}
+
 	case OBJECT_TYPE_PORTAL:
 	{
 		float r = (float)atof(tokens[3].c_str());
@@ -230,9 +250,10 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 	// General object setup
 	obj->SetPosition(x, y);
-
-
 	objects.push_back(obj);
+
+	obj = NULL;
+	delete obj;
 }
 
 void CPlayScene::LoadAssets(LPCWSTR assetFile)
@@ -413,6 +434,7 @@ void CPlayScene::PurgeDeletedObjects()
 		LPGAMEOBJECT o = *it;
 		if (o->IsDeleted())
 		{
+			//DebugOut(L"Obj was deleted\n");
 			delete o;
 			*it = NULL;
 		}

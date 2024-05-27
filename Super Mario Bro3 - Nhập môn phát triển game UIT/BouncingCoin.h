@@ -18,4 +18,5 @@ public:
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects = NULL);
 	void SetState(int state);
 	void Render();
+	int IsCollidable() { return 0; }
 };

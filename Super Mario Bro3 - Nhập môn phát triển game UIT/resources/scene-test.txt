@@ -7,16 +7,16 @@ resources\block.txt
 resources\background-element.txt
 resources\goomba.txt
 resources\powerup.txt
+resources\pipe.txt
 #
-
-[BOUNDARIES]
 #because the program will render object in the order of loading this file, so first in last stand !!
+[BOUNDARIES]
 #left	top	right	bottom 
 0	-16	175	15
 
 [OBJECTS]
 # type	x	y	extra_settings per object type
-# type: 0 = Mario , 1 = Brick, 2 = Goomba, 3 = Koopas, 5 = platform, 6 = ground
+# type: 0 = Mario , 1 = Block, 2 = Goomba, 3 = Koopas, 5 = platform, 6 = ground, 7 = pipe
 # See OBJECT_TYPE constants in AssetIDs.h
 
 
@@ -34,12 +34,18 @@ resources\powerup.txt
 5	134	8	3	-15311	-15312	-15313
 
 #GOOMBA
-#2	300	160
+2	300	160
 
 #BLOCK 
 1	11	7	0
-1	12	7	2
-
+1	12	7	0
+1	14	4	0
+1	15	4	2
+1	26	5	0
+1	41	9	2
+1	44	7	0
+1	92	7	2
+1	90	-7	0
 
 #Ground
 #x, y below represent for grid cell
@@ -52,12 +58,15 @@ resources\powerup.txt
 6	104	11	36	61000	62000	63000
 6	141	11	38	61000	62000	63000
 
-#Portal 
-#50	200	160	216	180	1
-
-
+#pipe			
+#id	x	y	dir	flip	length	isTrans		
+7	22	10	1	0	2	0	
+7	112	10	1	0	1	0	
+7	116	10	1	0	2	0
+7	141	3	1	0	11	0
+7	145	10	1	0	1	0
 # MARIO
-0	0	0
+0	24	160
 
 [BACKGROUND]
 #x, y below represent for grid cell

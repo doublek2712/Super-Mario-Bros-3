@@ -4,14 +4,13 @@
 #include "PlayScene.h"
 #include "Mario.h"
 
-CSuperLeaf::CSuperLeaf(float x, float y) :CGameObject(x, y) {
+CSuperLeaf::CSuperLeaf(float x, float y, CSuperMushroom* mushroom) :CGameObject(x, y) {
 	this->state = CONTAINED_STATE_DEACTIVE;
-	this->level = LEAF_LEVEL_LEAF;
 	this->dir = 1;
+	this->mushroom = mushroom;
 }
 
 void CSuperLeaf::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects) {
-
 	if (this->state == CONTAINED_STATE_ACTIVE) {
 		y += vy * dt;
 		x += vx * dt;
@@ -19,13 +18,13 @@ void CSuperLeaf::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects) {
 			vy += 0.0008f * dt;
 
 		if (vy > 0){
+			vy = 0.0008f * dt;
 			if (dir == -1) {
 				if (vx >= -0.05f)
 					vx -= 0.0001f * dt;
 				else
 				{
 					dir = 1;
-					//vx = 0;
 				}
 			}
 			else 
@@ -35,28 +34,24 @@ void CSuperLeaf::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects) {
 				else
 				{
 					dir = -1;
-					//vx = 0;
 				}
 			}
 		}
 	}
+
+	if (state == LEAF_STATE_DIE)
+		isDeleted = true;
 }
 void CSuperLeaf::Render() {
-	if (state == CONTAINED_STATE_DEACTIVE) return;
+	if (state == CONTAINED_STATE_DEACTIVE || state == LEAF_STATE_DIE) return;
 
 	CSprites* s = CSprites::GetInstance();
-	switch (level)
-	{
-	case LEAF_LEVEL_MUSHROOM:
-		s->Get(ID_SPRITE_POWERUP_MUSHROOM)->Draw(x, y);
-		break;
-	case LEAF_LEVEL_LEAF:
+
 		if(dir == 1)
 			s->Get(ID_SPRITE_POWERUP_LEAF_RIGHT)->Draw(x, y);
 		else
 			s->Get(ID_SPRITE_POWERUP_LEAF_LEFT)->Draw(x, y);
-		break;
-	}
+		//RenderBoundingBox();
 
 }
 void CSuperLeaf::GetBoundingBox(float& l, float& t, float& r, float& b) {
@@ -66,20 +61,28 @@ void CSuperLeaf::GetBoundingBox(float& l, float& t, float& r, float& b) {
 	b = t + LEAF_BBOX_HEIGHT;
 }
 void CSuperLeaf::SetState(int state) {
-	if (this->state == CONTAINED_STATE_ACTIVE) return;
+	//if (this->state == CONTAINED_STATE_ACTIVE) return;
 	switch (state) {
 	case CONTAINED_STATE_ACTIVE:
 	{
-		vy = -0.2f;
 		CPlayScene* s = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
 		CMario* player = (CMario*)s->GetPlayer();
 		switch (player->GetLevel())
 		{
 		case MARIO_LEVEL_SMALL:
+			mushroom->SetState(state);
+			SetState(LEAF_STATE_DIE);
+			return;
+		default:
+			vy = -0.2f;
 			break;
 		}
 		break;
 	}
+
 	}
 	CGameObject::SetState(state);
+}
+int CSuperLeaf::IsCollidable() {
+	return (state != CONTAINED_STATE_DEACTIVE);
 }
