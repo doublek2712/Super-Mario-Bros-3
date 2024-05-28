@@ -1,6 +1,7 @@
 #include "SuperMushroom.h"
 #include "AssetIDs.h"
 #include "Mario.h"
+#include "Configs.h"
 
 #include "debug.h"
 
@@ -8,7 +9,7 @@ CSuperMushroom::CSuperMushroom(float x, float y) :CGameObject(x, y)
 {
 	this->ax = 0;
 	this->ay = MUSHROOM_GRAVITY;
-	this->def_y = y - 16;
+	this->def_y = y - GRID_SIZE;
 	SetState(CONTAINED_STATE_DEACTIVE);
 }
 
@@ -44,6 +45,11 @@ void CSuperMushroom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	if (state == CONTAINED_STATE_DEACTIVE) return;
 	if (state == CONTAINED_STATE_ACTIVE) {
+		if(y <= def_y + GRID_SIZE - 2)
+			SetState(MUSHROOM_STATE_COMEOUT);
+	}
+	else
+	if (state == MUSHROOM_STATE_COMEOUT) {
 		if (y <= def_y)
 		{
 			y = def_y;
@@ -66,7 +72,7 @@ void CSuperMushroom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 void CSuperMushroom::Render()
 {
-	if (state == CONTAINED_STATE_DEACTIVE) return;
+	if (state == CONTAINED_STATE_DEACTIVE || state == CONTAINED_STATE_ACTIVE) return;
 	CSprites* s = CSprites::GetInstance();
 	s->Get(ID_SPRITE_POWERUP_MUSHROOM)->Draw(x, y);
 	
@@ -79,7 +85,7 @@ void CSuperMushroom::SetState(int state)
 	switch (state)
 	{
 	case CONTAINED_STATE_ACTIVE:
-		vy = -0.01f;
+		vy = -MUSHROOM_COMEOUT_SPEED;
 		break;
 	case MUSHROOM_STATE_DIE:
 		vx = 0;

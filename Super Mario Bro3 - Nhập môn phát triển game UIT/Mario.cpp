@@ -15,6 +15,10 @@
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	if (isOnPlatform)
+		ay = MARIO_GRAVITY;
+	else
+		ay = MARIO_ON_AIR_DECLERATION;
 	vy += ay * dt;
 	vx += ax * dt;
 
@@ -26,6 +30,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		untouchable_start = 0;
 		untouchable = 0;
 	}
+
 
 	isOnPlatform = false;
 

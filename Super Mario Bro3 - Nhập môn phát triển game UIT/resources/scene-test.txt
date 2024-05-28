@@ -3,6 +3,7 @@
 resources\mario.txt
 resources\coin.txt
 resources\ground.txt
+resources\cloud.txt
 resources\block.txt
 resources\background-element.txt
 resources\goomba.txt
@@ -33,6 +34,9 @@ resources\pipe.txt
 5	136	2	3	-15211	-15212	-15213
 5	134	8	3	-15311	-15312	-15313
 
+5	88	-3	4	50000	50000	50000
+5	93	-4	13	50000	50000	50000
+
 #GOOMBA
 2	300	160
 
@@ -58,6 +62,9 @@ resources\pipe.txt
 6	104	11	36	61000	62000	63000
 6	141	11	38	61000	62000	63000
 
+6	141	9	2	82001	82002	82002
+6	141	10	2	82001	82002	82002
+
 #pipe			
 #id	x	y	dir	flip	length	isTrans		
 7	22	10	1	0	2	0	
@@ -65,6 +72,30 @@ resources\pipe.txt
 7	116	10	1	0	2	0
 7	141	3	1	0	11	0
 7	145	10	1	0	1	0
+
+#wood
+8	94	6
+8	95	6
+
+8	98	10
+8	99	10
+8	100	10
+8	99	9
+8	100	9
+8	100	8
+
+8	104	10
+8	105	10
+8	106	10
+8	104	9
+8	105	9
+8	104	8
+
+8	141	8
+8	142	8
+
+8	141	4
+8	142	4
 # MARIO
 0	24	160
 
