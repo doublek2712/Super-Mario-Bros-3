@@ -9,6 +9,8 @@ resources\background-element.txt
 resources\goomba.txt
 resources\powerup.txt
 resources\pipe.txt
+resources\piranha.txt
+resources\bullet.txt
 #
 #because the program will render object in the order of loading this file, so first in last stand !!
 [BOUNDARIES]
@@ -65,6 +67,10 @@ resources\pipe.txt
 6	141	9	2	82001	82002	82002
 6	141	10	2	82001	82002	82002
 
+
+#VENUS
+#9	22	8	2
+9	22	8	1
 #pipe			
 #id	x	y	dir	flip	length	isTrans		
 7	22	10	1	0	2	0	
@@ -96,6 +102,8 @@ resources\pipe.txt
 
 8	141	4
 8	142	4
+
+
 # MARIO
 0	24	160
 

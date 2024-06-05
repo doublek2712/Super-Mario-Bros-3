@@ -10,6 +10,8 @@
 #include "Block.h"
 #include "SuperMushroom.h"
 #include "SuperLeaf.h"
+#include "FireBullet.h"
+#include "VenusPiranha.h"
 
 #include "Collision.h"
 
@@ -68,6 +70,21 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithSuperMushroom(e);
 	else if (dynamic_cast<CSuperLeaf*>(e->obj))
 		OnCollisionWithSuperLeaf(e);
+	else if (dynamic_cast<CFireBullet*>(e->obj))
+		OnCollisionWithFire(e);
+	else if (dynamic_cast<CVenusPiranha*>(e->obj))
+		OnCollisionWithPiranha(e);
+}
+
+void CMario::OnCollisionWithFire(LPCOLLISIONEVENT e) {
+
+	HitByEnemy();
+
+}
+void CMario::OnCollisionWithPiranha(LPCOLLISIONEVENT e) {
+
+	HitByEnemy();
+
 }
 void CMario::OnCollisionWithSuperLeaf(LPCOLLISIONEVENT e) {
 	CSuperLeaf* leaf = dynamic_cast<CSuperLeaf*>(e->obj);
@@ -119,16 +136,7 @@ void CMario::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
 		{
 			if (goomba->GetState() != GOOMBA_STATE_DIE)
 			{
-				if (level > MARIO_LEVEL_SMALL)
-				{
-					level = MARIO_LEVEL_SMALL;
-					StartUntouchable();
-				}
-				else
-				{
-					DebugOut(L">>> Mario DIE >>> \n");
-					SetState(MARIO_STATE_DIE);
-				}
+				HitByEnemy();
 			}
 		}
 	}
@@ -146,7 +154,28 @@ void CMario::OnCollisionWithPortal(LPCOLLISIONEVENT e)
 	CPortal* p = (CPortal*)e->obj;
 	CGame::GetInstance()->InitiateSwitchScene(p->GetSceneId());
 }
-
+void CMario::HitByEnemy()
+{
+	if (untouchable == 0)
+	{
+		if (level == MARIO_LEVEL_RACCOON)
+		{
+			level = MARIO_LEVEL_BIG;
+			StartUntouchable();
+		}
+		else
+			if (level > MARIO_LEVEL_SMALL)
+			{
+				level = MARIO_LEVEL_SMALL;
+				StartUntouchable();
+			}
+			else
+			{
+				DebugOut(L">>> Mario DIE >>> \n");
+				SetState(MARIO_STATE_DIE);
+			}
+	}
+}
 //
 // Get animation ID for small Mario
 //

@@ -8,8 +8,8 @@
 void CBackgroundElement::Render()
 {
 	if (this->row <= 0 || this->col <=0) return;
-	float xx = x * GRID_SIZE + BG_WIDTH_BUFFER;
-	float yy = y * GRID_SIZE + BG_HEIGHT_BUFFER;
+	float xx = x * GRID_SIZE + WD_WIDTH_BUFFER;
+	float yy = y * GRID_SIZE + WD_HEIGHT_BUFFER;
 	CSprites* s = CSprites::GetInstance();
 	for (int i = 0; i < this->row; i++) {
 		for (int j = 0; j < this->col; j++) {
@@ -17,6 +17,6 @@ void CBackgroundElement::Render()
 			xx += GRID_SIZE;
 		}
 		yy += GRID_SIZE;
-		xx = x * GRID_SIZE + BG_WIDTH_BUFFER;
+		xx = x * GRID_SIZE + WD_WIDTH_BUFFER;
 	}
 }
