@@ -11,6 +11,7 @@ resources\powerup.txt
 resources\pipe.txt
 resources\piranha.txt
 resources\bullet.txt
+resources\koopa.txt
 #
 #because the program will render object in the order of loading this file, so first in last stand !!
 [BOUNDARIES]
