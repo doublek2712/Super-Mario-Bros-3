@@ -35,6 +35,9 @@
 #define MARIO_STATE_SIT				600
 #define MARIO_STATE_SIT_RELEASE		601
 
+#define MARIO_STATE_KICK			700
+
+#define MARIO_STATE_HOLDING			800
 
 #pragma region ANIMATION_ID
 
@@ -59,6 +62,15 @@
 #define ID_ANI_MARIO_BRACE_RIGHT 1000
 #define ID_ANI_MARIO_BRACE_LEFT 1001
 
+#define ID_ANI_MARIO_KICK_RIGHT 1010
+#define ID_ANI_MARIO_KICK_LEFT 1011
+
+#define ID_ANI_MARIO_HOLD_LEFT_IDLE 1020
+#define ID_ANI_MARIO_HOLD_LEFT_WALKING 1021
+
+#define ID_ANI_MARIO_HOLD_RIGHT_IDLE 1025
+#define ID_ANI_MARIO_HOLD_RIGHT_WALKING 1026
+
 #define ID_ANI_MARIO_DIE 999
 
 // SMALL MARIO
@@ -79,6 +91,15 @@
 
 #define ID_ANI_MARIO_SMALL_JUMP_RUN_RIGHT 1600
 #define ID_ANI_MARIO_SMALL_JUMP_RUN_LEFT 1601
+
+#define ID_ANI_MARIO_SMALL_KICK_RIGHT 1610
+#define ID_ANI_MARIO_SMALL_KICK_LEFT 1611
+
+#define ID_ANI_MARIO_SMALL_HOLD_LEFT_IDLE 1620
+#define ID_ANI_MARIO_SMALL_HOLD_LEFT_WALKING 1621
+
+#define ID_ANI_MARIO_SMALL_HOLD_RIGHT_IDLE 1625
+#define ID_ANI_MARIO_SMALL_HOLD_RIGHT_WALKING 1626
 
 // RACCOON MARIO
 #define ID_ANI_MARIO_RACCOON_IDLE_RIGHT 1700
@@ -102,6 +123,15 @@
 #define ID_ANI_MARIO_RACCOON_BRACE_RIGHT 2300
 #define ID_ANI_MARIO_RACCOON_BRACE_LEFT 2301
 
+#define ID_ANI_MARIO_RACCOON_KICK_RIGHT 2310
+#define ID_ANI_MARIO_RACCOON_KICK_LEFT 2311
+
+#define ID_ANI_MARIO_RACCOON_HOLD_LEFT_IDLE 2320
+#define ID_ANI_MARIO_RACCOON_HOLD_LEFT_WALKING 2321
+
+#define ID_ANI_MARIO_RACCOON_HOLD_RIGHT_IDLE 2325
+#define ID_ANI_MARIO_RACCOON_HOLD_RIGHT_WALKING 2326
+
 #pragma endregion
 
 #define GROUND_Y 160.0f
@@ -124,7 +154,8 @@
 #define MARIO_SMALL_BBOX_HEIGHT 12
 
 
-#define MARIO_UNTOUCHABLE_TIME 2500
+#define MARIO_UNTOUCHABLE_TIME 3000
+#define MARIO_KICK_ANI_TIME 300
 
 class CMario : public CGameObject
 {
@@ -139,6 +170,14 @@ class CMario : public CGameObject
 	BOOLEAN isOnPlatform;
 	int coin;
 
+	BOOLEAN isKicking;
+	ULONGLONG kick_start;
+
+	BOOLEAN readyToHold;
+	BOOLEAN isHolding;
+
+	CGameObject* koopaShell;
+
 	void OnCollisionWithFire(LPCOLLISIONEVENT e);
 	void OnCollisionWithSuperLeaf(LPCOLLISIONEVENT e);
 	void OnCollisionWithSuperMushroom(LPCOLLISIONEVENT e);
@@ -147,10 +186,12 @@ class CMario : public CGameObject
 	void OnCollisionWithCoin(LPCOLLISIONEVENT e);
 	void OnCollisionWithPortal(LPCOLLISIONEVENT e);
 	void OnCollisionWithPiranha(LPCOLLISIONEVENT e);
+	void OnCollisionWithKoopa(LPCOLLISIONEVENT e);
 
 	int GetAniIdRaccoon();
 	int GetAniIdBig();
 	int GetAniIdSmall();
+
 
 public:
 	CMario(float x, float y) : CGameObject(x, y)
@@ -163,8 +204,13 @@ public:
 		level = MARIO_LEVEL_SMALL;
 		untouchable = 0;
 		untouchable_start = -1;
+		kick_start = -1;
 		isOnPlatform = false;
 		coin = 0;
+		isKicking = FALSE;
+		readyToHold = FALSE;
+		isHolding = FALSE;
+		koopaShell = nullptr;
 	}
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	void Render();
@@ -187,4 +233,6 @@ public:
 	void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 
 	void HitByEnemy();
+	void Hold();
+	void ReleaseHold();
 };

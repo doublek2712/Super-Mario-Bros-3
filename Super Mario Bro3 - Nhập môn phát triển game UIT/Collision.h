@@ -81,7 +81,7 @@ public:
 		int filterX,
 		int filterY);
 
-	void Process(LPGAMEOBJECT objSrc, DWORD dt, vector<LPGAMEOBJECT>* coObjects);
+	void Process(LPGAMEOBJECT objSrc, DWORD dt, vector<LPGAMEOBJECT>* coObjects, int detectNextPlatform = 0);
 
 	static CCollision* GetInstance();
 };

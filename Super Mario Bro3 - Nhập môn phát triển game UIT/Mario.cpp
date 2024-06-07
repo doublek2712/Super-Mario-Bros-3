@@ -12,6 +12,7 @@
 #include "SuperLeaf.h"
 #include "FireBullet.h"
 #include "VenusPiranha.h"
+#include "Koopa.h"
 
 #include "Collision.h"
 
@@ -31,6 +32,12 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		untouchable_start = 0;
 		untouchable = 0;
+	}
+
+	if (GetTickCount64() - kick_start > MARIO_KICK_ANI_TIME)
+	{
+		kick_start = 0;
+		isKicking = FALSE;
 	}
 
 
@@ -74,6 +81,54 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithFire(e);
 	else if (dynamic_cast<CVenusPiranha*>(e->obj))
 		OnCollisionWithPiranha(e);
+	else if (dynamic_cast<CKoopa*>(e->obj))
+		OnCollisionWithKoopa(e);
+}
+
+void CMario::OnCollisionWithKoopa(LPCOLLISIONEVENT e)
+{
+	CKoopa* koopa = dynamic_cast<CKoopa*>(e->obj);
+
+	// jump on top >> 
+	if (e->ny < 0)
+	{
+		if (koopa->GetState() == KOOPA_STATE_WALKING)
+		{
+			koopa->SetState(KOOPA_STATE_SHELL_IDLE);
+			vy = -MARIO_JUMP_DEFLECT_SPEED;
+		}
+		else
+		if (koopa->GetState() == KOOPA_STATE_SHELL_IDLE)
+		{
+			koopa->SetState(KOOPA_STATE_SHELL_MOVE);
+			vy = -MARIO_JUMP_DEFLECT_SPEED;
+		}
+	}
+	else 
+	{
+		if (untouchable == 0)
+		{
+			if (koopa->GetState() != KOOPA_STATE_SHELL_IDLE)
+			{
+				HitByEnemy();
+			}
+			else
+			{
+				if (readyToHold)
+				{
+					koopa->HoldByMario(&x, &y, &nx);
+					koopaShell = koopa;
+					SetState(MARIO_STATE_HOLDING);
+				}
+				else
+				{
+					SetState(MARIO_STATE_KICK);
+					koopa->KickedByMario(nx);
+				}
+
+			}
+		}
+	}
 }
 
 void CMario::OnCollisionWithFire(LPCOLLISIONEVENT e) {
@@ -124,7 +179,7 @@ void CMario::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
 	// jump on top >> kill Goomba and deflect a bit 
 	if (e->ny < 0)
 	{
-		if (goomba->GetState() != GOOMBA_STATE_DIE)
+		if (goomba->GetState() != GOOMBA_STATE_DIE && goomba->GetState() != GOOMBA_STATE_HIT)
 		{
 			goomba->SetState(GOOMBA_STATE_DIE);
 			vy = -MARIO_JUMP_DEFLECT_SPEED;
@@ -134,7 +189,7 @@ void CMario::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
 	{
 		if (untouchable == 0)
 		{
-			if (goomba->GetState() != GOOMBA_STATE_DIE)
+			if (goomba->GetState() != GOOMBA_STATE_DIE && goomba->GetState() != GOOMBA_STATE_HIT)
 			{
 				HitByEnemy();
 			}
@@ -210,11 +265,30 @@ int CMario::GetAniIdSmall()
 		else
 			if (vx == 0)
 			{
+				if (isHolding)
+				{
+					aniId = (nx > 0) ? ID_ANI_MARIO_SMALL_HOLD_RIGHT_IDLE : ID_ANI_MARIO_SMALL_HOLD_LEFT_IDLE;
+				}
+				else
+				if (isKicking)
+				{
+					aniId = (nx > 0) ? ID_ANI_MARIO_SMALL_KICK_RIGHT : ID_ANI_MARIO_SMALL_KICK_LEFT;
+				}
 				if (nx > 0) aniId = ID_ANI_MARIO_SMALL_IDLE_RIGHT;
 				else aniId = ID_ANI_MARIO_SMALL_IDLE_LEFT;
 			}
 			else if (vx > 0)
 			{
+				if (isHolding)
+				{
+					aniId = ID_ANI_MARIO_SMALL_HOLD_RIGHT_WALKING;
+				}
+				else
+				if (isKicking)
+				{
+					aniId = ID_ANI_MARIO_SMALL_KICK_RIGHT;
+				}
+				else
 				if (ax < 0)
 					aniId = ID_ANI_MARIO_SMALL_BRACE_RIGHT;
 				else if (ax == MARIO_ACCEL_RUN_X)
@@ -224,6 +298,16 @@ int CMario::GetAniIdSmall()
 			}
 			else // vx < 0
 			{
+				if (isHolding)
+				{
+					aniId = ID_ANI_MARIO_SMALL_HOLD_LEFT_WALKING;
+				}
+				else
+				if (isKicking)
+				{
+					aniId = ID_ANI_MARIO_SMALL_KICK_LEFT;
+				}
+				else
 				if (ax > 0)
 					aniId = ID_ANI_MARIO_SMALL_BRACE_LEFT;
 				else if (ax == -MARIO_ACCEL_RUN_X)
@@ -272,11 +356,31 @@ int CMario::GetAniIdBig()
 		else
 			if (vx == 0)
 			{
+				if (isHolding)
+				{
+					aniId = (nx > 0) ? ID_ANI_MARIO_HOLD_RIGHT_IDLE : ID_ANI_MARIO_HOLD_LEFT_IDLE;
+				}
+				else
+				if (isKicking)
+				{
+					aniId = (nx > 0) ? ID_ANI_MARIO_KICK_RIGHT : ID_ANI_MARIO_KICK_LEFT;
+				}
+				else
 				if (nx > 0) aniId = ID_ANI_MARIO_IDLE_RIGHT;
 				else aniId = ID_ANI_MARIO_IDLE_LEFT;
 			}
 			else if (vx > 0)
 			{
+				if (isHolding)
+				{
+					aniId = ID_ANI_MARIO_HOLD_RIGHT_WALKING;
+				}
+				else
+				if (isKicking)
+				{
+					aniId = ID_ANI_MARIO_KICK_RIGHT;
+				}
+				else
 				if (ax < 0)
 					aniId = ID_ANI_MARIO_BRACE_RIGHT;
 				else if (ax == MARIO_ACCEL_RUN_X)
@@ -286,6 +390,16 @@ int CMario::GetAniIdBig()
 			}
 			else // vx < 0
 			{
+				if (isHolding)
+				{
+					aniId = ID_ANI_MARIO_HOLD_LEFT_WALKING;
+				}
+				else
+				if (isKicking)
+				{
+					aniId = ID_ANI_MARIO_KICK_LEFT;
+				}
+				else
 				if (ax > 0)
 					aniId = ID_ANI_MARIO_BRACE_LEFT;
 				else if (ax == -MARIO_ACCEL_RUN_X)
@@ -300,7 +414,7 @@ int CMario::GetAniIdBig()
 }
 
 //
-// Get animdation ID for big Mario
+// Get animdation ID for raccoon Mario
 //
 int CMario::GetAniIdRaccoon()
 {
@@ -333,11 +447,31 @@ int CMario::GetAniIdRaccoon()
 		else
 			if (vx == 0)
 			{
+				if (isHolding)
+				{
+					aniId = (nx > 0) ? ID_ANI_MARIO_RACCOON_HOLD_RIGHT_IDLE : ID_ANI_MARIO_RACCOON_HOLD_LEFT_IDLE;
+				}
+				else
+				if (isKicking)
+				{
+					aniId = (nx > 0) ? ID_ANI_MARIO_RACCOON_KICK_RIGHT : ID_ANI_MARIO_RACCOON_KICK_LEFT;
+				}
+				else 
 				if (nx > 0) aniId = ID_ANI_MARIO_RACCOON_IDLE_RIGHT;
 				else aniId = ID_ANI_MARIO_RACCOON_IDLE_LEFT;
 			}
 			else if (vx > 0)
 			{
+				if (isHolding)
+				{
+					aniId = ID_ANI_MARIO_RACCOON_HOLD_RIGHT_WALKING;
+				}
+				else
+				if (isKicking)
+				{
+					aniId = ID_ANI_MARIO_RACCOON_KICK_RIGHT;
+				}
+				else
 				if (ax < 0)
 					aniId = ID_ANI_MARIO_RACCOON_BRACE_RIGHT;
 				else if (ax == MARIO_ACCEL_RUN_X)
@@ -347,6 +481,16 @@ int CMario::GetAniIdRaccoon()
 			}
 			else // vx < 0
 			{
+				if (isHolding)
+				{
+					aniId = ID_ANI_MARIO_RACCOON_HOLD_LEFT_WALKING;
+				}
+				else
+				if (isKicking)
+				{
+					aniId = ID_ANI_MARIO_RACCOON_KICK_LEFT;
+				}
+				else
 				if (ax > 0)
 					aniId = ID_ANI_MARIO_RACCOON_BRACE_LEFT;
 				else if (ax == -MARIO_ACCEL_RUN_X)
@@ -447,6 +591,17 @@ void CMario::SetState(int state)
 		}
 		break;
 
+	case MARIO_STATE_KICK:
+		if (isSitting) return;
+		isKicking = TRUE;
+		kick_start = GetTickCount64();
+		break;
+
+	case MARIO_STATE_HOLDING:
+		readyToHold = FALSE;
+		isHolding = TRUE;
+		break;
+
 	case MARIO_STATE_IDLE:
 		ax = 0.0f;
 		vx = 0.0f;
@@ -531,4 +686,19 @@ int CMario::GetLevel()
 {
 	return this->level;
 }
+void CMario::Hold()
+{
+	readyToHold = TRUE;
+}
+void CMario::ReleaseHold()
+{
+	if (isHolding)
+	{
+		isHolding = FALSE;
+		CKoopa* koopa = dynamic_cast<CKoopa*>(koopaShell);
+		SetState(MARIO_STATE_KICK);
+		koopa->KickedByMario(nx);
+		koopaShell = nullptr;
+	}
 
+}

@@ -42,6 +42,10 @@ resources\koopa.txt
 
 #GOOMBA
 2	300	160
+2	450	160
+
+#KOOPA
+3	592	128	1
 
 #BLOCK 
 1	11	7	0
@@ -106,7 +110,7 @@ resources\koopa.txt
 
 
 # MARIO
-0	24	160
+0	500	160
 
 [BACKGROUND]
 #x, y below represent for grid cell

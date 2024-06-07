@@ -1,10 +1,12 @@
 #include "Goomba.h"
-
+#include "debug.h"
+#include "AssetIDs.h"
 CGoomba::CGoomba(float x, float y):CGameObject(x, y)
 {
 	this->ax = 0;
 	this->ay = GOOMBA_GRAVITY;
 	die_start = -1;
+	hit_nx = 0;
 	SetState(GOOMBA_STATE_WALKING);
 }
 
@@ -57,6 +59,11 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		isDeleted = true;
 		return;
 	}
+	else if ((state == GOOMBA_STATE_HIT) && (GetTickCount64() - die_start > GOOMBA_HIT_TIMEOUT))
+		{
+			isDeleted = true;
+			return;
+		}
 
 	CGameObject::Update(dt, coObjects);
 	CCollision::GetInstance()->Process(this, dt, coObjects);
@@ -71,7 +78,12 @@ void CGoomba::Render()
 		aniId = ID_ANI_GOOMBA_DIE;
 	}
 
-	CAnimations::GetInstance()->Get(aniId)->Render(x,y);
+	if (state == GOOMBA_STATE_HIT)
+	{
+		CSprites::GetInstance()->Get(ID_SPRITE_GOOMBA_WALK_1)->Draw(x, y, /*flipX*/TRUE);
+	}
+	else
+		CAnimations::GetInstance()->Get(aniId)->Render(x,y);
 	//RenderBoundingBox();
 }
 
@@ -90,5 +102,11 @@ void CGoomba::SetState(int state)
 		case GOOMBA_STATE_WALKING: 
 			vx = -GOOMBA_WALKING_SPEED;
 			break;
+		case GOOMBA_STATE_HIT:
+			die_start = GetTickCount64();
+			vy = -GOOMBA_HIT_DEFLECT_SPEED;
+			break;
 	}
 }
+
+

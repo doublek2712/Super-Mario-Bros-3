@@ -4,6 +4,9 @@
 #include "debug.h"
 #include "GameObject.h"
 
+#include "Koopa.h"
+
+
 int CCollisionEvent::WasCollided() {
 	return
 		t >= 0.0f && t <= 1.0f && obj->IsDirectionColliable(nx, ny)==1;
@@ -224,7 +227,10 @@ void CCollision::Filter( LPGAMEOBJECT objSrc,
 *  Simple/Sample collision framework 
 *  NOTE: Student might need to improve this based on game logic 
 */
-void CCollision::Process(LPGAMEOBJECT objSrc, DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+void CCollision::Process(LPGAMEOBJECT objSrc, 
+	DWORD dt, 
+	vector<LPGAMEOBJECT>* coObjects, 
+	int detectNextPlatform) // 0 = do not detect, 1 = detect next platform , used for koopa red when he walk on successive blocks
 {
 	vector<LPCOLLISIONEVENT> coEvents;
 	LPCOLLISIONEVENT colX = NULL; 
@@ -326,6 +332,7 @@ void CCollision::Process(LPGAMEOBJECT objSrc, DWORD dt, vector<LPGAMEOBJECT>* co
 		{
 			x += colX->t * dx + colX->nx * BLOCK_PUSH_FACTOR;
 			y += dy;
+			
 			objSrc->OnCollisionWith(colX);
 		}
 		else 
@@ -334,6 +341,26 @@ void CCollision::Process(LPGAMEOBJECT objSrc, DWORD dt, vector<LPGAMEOBJECT>* co
 				x += dx;
 				y += colY->t * dy + colY->ny * BLOCK_PUSH_FACTOR;
 				objSrc->OnCollisionWith(colY);
+				if (detectNextPlatform)
+				{
+					LPCOLLISIONEVENT colY_other = NULL;
+					
+					colY->isDeleted = true;		// remove current collision event on Y
+
+					// replace with a new collision event using corrected location 
+					//coEvents.push_back(SweptAABB(objSrc, dt, colY->obj));
+
+					// re-filter on Y only
+					Filter(objSrc, coEvents, colX, colY_other, /*filterBlock = */ 1, /*filterX=*/0, /*filterY=*/1);
+
+					if (colY_other != NULL)
+					{
+						//y += colY_other->t * dy + colY_other->ny * BLOCK_PUSH_FACTOR;
+						objSrc->OnCollisionWith(colY_other);
+					}
+				}
+				
+				
 			}
 			else // both colX & colY are NULL 
 			{

@@ -20,6 +20,7 @@
 #include "Pipe.h"
 #include "Wood.h"
 #include "VenusPiranha.h"
+#include "Koopa.h"
 
 #include "SampleKeyEventHandler.h"
 
@@ -261,7 +262,13 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		obj = new CVenusPiranha(x, y, height);
 		break;
 	}
-
+	case OBJECT_TYPE_KOOPA:
+	{
+		BOOLEAN isBlock = (atoi(tokens[3].c_str()) == 0) ? FALSE : TRUE;
+		obj = new CKoopa(x, y, isBlock);
+		
+		break;
+	}
 	default:
 		DebugOut(L"[ERROR] Invalid object type: %d\n", object_type);
 		return;
