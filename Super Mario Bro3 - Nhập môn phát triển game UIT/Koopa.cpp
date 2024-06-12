@@ -139,8 +139,7 @@ void CKoopa::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if(!isHeld)
 		CCollision::GetInstance()->Process(this, dt, coObjects, 1);
 	else {
-		x = *m_x + *m_nx * KOOPA_BBOX_WIDTH/2;
-		y = *m_y + 1;
+		
 	}
 }
 
@@ -207,4 +206,13 @@ void CKoopa::HoldByMario(float* x, float* y, int* nx)
 	m_y = y;
 	m_nx = nx;
 	SetState(KOOPA_STATE_HELD);
+}
+
+void CKoopa::UpdatePositionFollowMario()
+{
+	if (isHeld)
+	{
+		x = *m_x + *m_nx * (KOOPA_BBOX_WIDTH / 2 + 4);
+		y = *m_y - 1;
+	}
 }

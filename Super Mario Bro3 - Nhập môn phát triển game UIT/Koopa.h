@@ -64,4 +64,5 @@ public:
 	virtual void SetState(int state);
 	void KickedByMario(int nx);
 	void HoldByMario(float* x, float* y, int* nx);
+	void UpdatePositionFollowMario();
 };

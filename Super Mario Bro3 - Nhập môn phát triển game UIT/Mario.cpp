@@ -22,10 +22,26 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		ay = MARIO_GRAVITY;
 	else
 		ay = MARIO_ON_AIR_DECLERATION;
+
 	vy += ay * dt;
 	vx += ax * dt;
 
-	if (abs(vx) > abs(maxVx)) vx = maxVx;
+	if (ax == 0 && vx != 0) {
+		float deccel = (vx > 0) ? -MARIO_DECCEL_WALK : MARIO_DECCEL_WALK;
+		if (deccel > 0)
+			vx = min(vx + deccel * dt, 0);
+		else
+			vx = max(vx + deccel * dt, 0);
+	}
+
+	if (abs(vx) > abs(maxVx)) {
+		vx = maxVx;
+		if (state == MARIO_STATE_ACCEL_TO_RUN_RIGHT)
+			SetState(MARIO_STATE_RUNNING_RIGHT);
+		else if (state == MARIO_STATE_ACCEL_TO_RUN_LEFT)
+			SetState(MARIO_STATE_RUNNING_LEFT);
+	}
+	DebugOutTitle(L"vx=%f", vx);
 
 	// reset untouchable timer if untouchable time has passed
 	if (GetTickCount64() - untouchable_start > MARIO_UNTOUCHABLE_TIME)
@@ -44,6 +60,11 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	isOnPlatform = false;
 
 	CCollision::GetInstance()->Process(this, dt, coObjects);
+
+	if (isHolding) {
+		CKoopa* koopa = dynamic_cast<CKoopa*>(koopaShell);
+		koopa->UpdatePositionFollowMario();
+	}
 }
 
 void CMario::OnNoCollision(DWORD dt)
@@ -88,6 +109,8 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 void CMario::OnCollisionWithKoopa(LPCOLLISIONEVENT e)
 {
 	CKoopa* koopa = dynamic_cast<CKoopa*>(e->obj);
+
+	if (koopa->GetState() == KOOPA_STATE_HELD) return;
 
 	// jump on top >> 
 	if (e->ny < 0)
@@ -239,6 +262,11 @@ int CMario::GetAniIdSmall()
 	int aniId = -1;
 	if (!isOnPlatform)
 	{
+		if (isHolding)
+		{
+			aniId = (nx > 0) ? ID_ANI_MARIO_SMALL_HOLD_RIGHT_JUMP : ID_ANI_MARIO_SMALL_HOLD_LEFT_JUMP;
+		}
+		else
 		if (abs(ax) == MARIO_ACCEL_RUN_X)
 		{
 			if (nx >= 0)
@@ -274,6 +302,7 @@ int CMario::GetAniIdSmall()
 				{
 					aniId = (nx > 0) ? ID_ANI_MARIO_SMALL_KICK_RIGHT : ID_ANI_MARIO_SMALL_KICK_LEFT;
 				}
+				else
 				if (nx > 0) aniId = ID_ANI_MARIO_SMALL_IDLE_RIGHT;
 				else aniId = ID_ANI_MARIO_SMALL_IDLE_LEFT;
 			}
@@ -289,11 +318,11 @@ int CMario::GetAniIdSmall()
 					aniId = ID_ANI_MARIO_SMALL_KICK_RIGHT;
 				}
 				else
-				if (ax < 0)
+				if (ax < 0 || nx < 0)
 					aniId = ID_ANI_MARIO_SMALL_BRACE_RIGHT;
 				else if (ax == MARIO_ACCEL_RUN_X)
 					aniId = ID_ANI_MARIO_SMALL_RUNNING_RIGHT;
-				else if (ax == MARIO_ACCEL_WALK_X)
+				else if (ax == MARIO_ACCEL_WALK_X || ax == MARIO_ACCEL_WALK_TO_RUN || ax == 0)
 					aniId = ID_ANI_MARIO_SMALL_WALKING_RIGHT;
 			}
 			else // vx < 0
@@ -312,7 +341,7 @@ int CMario::GetAniIdSmall()
 					aniId = ID_ANI_MARIO_SMALL_BRACE_LEFT;
 				else if (ax == -MARIO_ACCEL_RUN_X)
 					aniId = ID_ANI_MARIO_SMALL_RUNNING_LEFT;
-				else if (ax == -MARIO_ACCEL_WALK_X)
+				else if (ax == -MARIO_ACCEL_WALK_X || ax == -MARIO_ACCEL_WALK_TO_RUN || ax == 0 )
 					aniId = ID_ANI_MARIO_SMALL_WALKING_LEFT;
 			}
 
@@ -330,6 +359,11 @@ int CMario::GetAniIdBig()
 	int aniId = -1;
 	if (!isOnPlatform)
 	{
+		if (isHolding)
+		{
+			aniId = (nx > 0) ? ID_ANI_MARIO_HOLD_RIGHT_JUMP : ID_ANI_MARIO_HOLD_LEFT_JUMP;
+		}
+		else
 		if (abs(ax) == MARIO_ACCEL_RUN_X)
 		{
 			if (nx >= 0)
@@ -385,7 +419,7 @@ int CMario::GetAniIdBig()
 					aniId = ID_ANI_MARIO_BRACE_RIGHT;
 				else if (ax == MARIO_ACCEL_RUN_X)
 					aniId = ID_ANI_MARIO_RUNNING_RIGHT;
-				else if (ax == MARIO_ACCEL_WALK_X)
+				else if (ax == MARIO_ACCEL_WALK_X || ax == MARIO_ACCEL_WALK_TO_RUN || ax == 0)
 					aniId = ID_ANI_MARIO_WALKING_RIGHT;
 			}
 			else // vx < 0
@@ -404,7 +438,7 @@ int CMario::GetAniIdBig()
 					aniId = ID_ANI_MARIO_BRACE_LEFT;
 				else if (ax == -MARIO_ACCEL_RUN_X)
 					aniId = ID_ANI_MARIO_RUNNING_LEFT;
-				else if (ax == -MARIO_ACCEL_WALK_X)
+				else if (ax == -MARIO_ACCEL_WALK_X || ax == -MARIO_ACCEL_WALK_TO_RUN || ax == 0)
 					aniId = ID_ANI_MARIO_WALKING_LEFT;
 			}
 
@@ -421,6 +455,11 @@ int CMario::GetAniIdRaccoon()
 	int aniId = -1;
 	if (!isOnPlatform)
 	{
+		if (isHolding)
+		{
+			aniId = (nx > 0) ? ID_ANI_MARIO_RACCOON_HOLD_RIGHT_JUMP : ID_ANI_MARIO_RACCOON_HOLD_LEFT_JUMP;
+		}
+		else
 		if (abs(ax) == MARIO_ACCEL_RUN_X)
 		{
 			if (nx >= 0)
@@ -476,7 +515,7 @@ int CMario::GetAniIdRaccoon()
 					aniId = ID_ANI_MARIO_RACCOON_BRACE_RIGHT;
 				else if (ax == MARIO_ACCEL_RUN_X)
 					aniId = ID_ANI_MARIO_RACCOON_RUNNING_RIGHT;
-				else if (ax == MARIO_ACCEL_WALK_X)
+				else if (ax == MARIO_ACCEL_WALK_X || ax == MARIO_ACCEL_WALK_TO_RUN || ax == 0)
 					aniId = ID_ANI_MARIO_RACCOON_WALKING_RIGHT;
 			}
 			else // vx < 0
@@ -495,7 +534,7 @@ int CMario::GetAniIdRaccoon()
 					aniId = ID_ANI_MARIO_RACCOON_BRACE_LEFT;
 				else if (ax == -MARIO_ACCEL_RUN_X)
 					aniId = ID_ANI_MARIO_RACCOON_RUNNING_LEFT;
-				else if (ax == -MARIO_ACCEL_WALK_X)
+				else if (ax == -MARIO_ACCEL_WALK_X || ax == -MARIO_ACCEL_WALK_TO_RUN || ax == 0)
 					aniId = ID_ANI_MARIO_RACCOON_WALKING_LEFT;
 			}
 
@@ -546,14 +585,31 @@ void CMario::SetState(int state)
 		break;
 	case MARIO_STATE_WALKING_RIGHT:
 		if (isSitting) return;
-		maxVx = MARIO_WALKING_SPEED;
-		ax = MARIO_ACCEL_WALK_X;
+		if (vx < 0 && -vx > MARIO_WALKING_SPEED)
+		{
+			maxVx = MARIO_RUNNING_SPEED;
+			ax = MARIO_DECCEL_RUN;
+		}
+		else
+		{
+			maxVx = MARIO_WALKING_SPEED;
+			ax = MARIO_ACCEL_WALK_X;
+		}
 		nx = 1;
 		break;
 	case MARIO_STATE_WALKING_LEFT:
 		if (isSitting) return;
-		maxVx = -MARIO_WALKING_SPEED;
-		ax = -MARIO_ACCEL_WALK_X;
+		if (vx > 0 && -vx < -MARIO_WALKING_SPEED)
+		{
+			maxVx = -MARIO_RUNNING_SPEED;
+			ax = -MARIO_DECCEL_RUN;
+		}
+		else
+		{
+			maxVx = -MARIO_WALKING_SPEED;
+			ax = -MARIO_ACCEL_WALK_X;
+		}
+
 		nx = -1;
 		break;
 	case MARIO_STATE_JUMP:
@@ -602,9 +658,29 @@ void CMario::SetState(int state)
 		isHolding = TRUE;
 		break;
 
+	case MARIO_STATE_ACCEL_TO_RUN_LEFT:
+		if (isSitting) return;
+		maxVx = -MARIO_RUNNING_SPEED;
+		if (vx <= 0)
+			ax = -MARIO_ACCEL_WALK_TO_RUN;
+		else
+			ax = -MARIO_DECCEL_RUN;
+		nx = -1;
+		break;
+
+	case MARIO_STATE_ACCEL_TO_RUN_RIGHT:
+		if (isSitting) return;
+		maxVx = MARIO_RUNNING_SPEED;
+		if (vx >= 0)
+			ax = MARIO_ACCEL_WALK_TO_RUN;
+		else
+			ax = MARIO_DECCEL_RUN;
+		nx = 1;
+		break;
+
 	case MARIO_STATE_IDLE:
 		ax = 0.0f;
-		vx = 0.0f;
+		//vx = 0.0f;
 		break;
 
 	case MARIO_STATE_DIE:
