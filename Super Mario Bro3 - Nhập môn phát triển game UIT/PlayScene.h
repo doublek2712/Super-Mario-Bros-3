@@ -13,6 +13,7 @@
 #define PLAY_STATE_LOSE 1
 #define PLAY_STATE_WIN	2
 
+
 class CPlayScene : public CScene
 {
 protected:

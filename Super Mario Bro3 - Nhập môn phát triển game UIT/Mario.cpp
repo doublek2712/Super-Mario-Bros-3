@@ -19,12 +19,16 @@
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	if (isOnPlatform)
+	{
 		ay = MARIO_GRAVITY;
+		isFlying = FALSE;
+	}
 	else
 		ay = MARIO_ON_AIR_DECLERATION;
-
 	vy += ay * dt;
 	vx += ax * dt;
+
+	DebugOutTitle(L"ax=%f", ax);
 
 	if (ax == 0 && vx != 0) {
 		float deccel = (vx > 0) ? -MARIO_DECCEL_WALK : MARIO_DECCEL_WALK;
@@ -41,7 +45,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		else if (state == MARIO_STATE_ACCEL_TO_RUN_LEFT)
 			SetState(MARIO_STATE_RUNNING_LEFT);
 	}
-	DebugOutTitle(L"vx=%f", vx);
+	//DebugOutTitle(L"vx=%f ; vy=%f\n", vx, vy);
 
 	// reset untouchable timer if untouchable time has passed
 	if (GetTickCount64() - untouchable_start > MARIO_UNTOUCHABLE_TIME)
@@ -81,10 +85,10 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		if (e->ny < 0) isOnPlatform = true;
 	}
 	else
-		if (e->nx != 0 && e->obj->IsBlocking())
-		{
-			vx = 0;
-		}
+	if (e->nx != 0 && e->obj->IsBlocking())
+	{
+		vx = 0;
+	}
 
 	if (dynamic_cast<CGoomba*>(e->obj))
 		OnCollisionWithGoomba(e);
@@ -621,10 +625,15 @@ void CMario::SetState(int state)
 			else
 				vy = -MARIO_JUMP_SPEED_Y;
 		}
+		else if (abs(this->vx) == MARIO_RUNNING_SPEED && level == MARIO_LEVEL_RACCOON)
+		{
+			isFlying = TRUE;
+			vy = -MARIO_JUMP_RUN_SPEED_Y;
+		}
 		break;
 
 	case MARIO_STATE_RELEASE_JUMP:
-		if (vy < 0) vy += MARIO_JUMP_SPEED_Y / 2;
+		if (vy < 0) vy += MARIO_JUMP_SPEED_Y / 3;
 		break;
 
 	case MARIO_STATE_SIT:

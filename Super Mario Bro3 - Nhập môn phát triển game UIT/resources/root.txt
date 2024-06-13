@@ -7,10 +7,8 @@ height	240
 # type: 0: intro, 1: play scene 
 [SCENES]
 0	resources\intro.txt
-1	resources\scene01.txt
-2	resources\scene02.txt
-5	resources\scene0005.txt
-100	resources\scene-test.txt
+1	resources\Map1-1.txt
+100	resources\test scene.txt
 
 # id	file 
 [TEXTURES]

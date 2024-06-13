@@ -374,7 +374,6 @@ void CPlayScene::Update(DWORD dt)
 
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
 	if (player == NULL) return;
-
 	// Update camera to follow mario
 	float cx, cy;
 	player->GetPosition(cx, cy);
@@ -391,10 +390,31 @@ void CPlayScene::Update(DWORD dt)
 	CGame* game = CGame::GetInstance();	
 	cx -= game->GetBackBufferWidth() / 2;
 	cy -= game->GetBackBufferHeight() / 2;
+	float s_width, s_height;
+	game->GetScreenSize(s_width, s_height);
 
-	if (cx < 0) cx = 0;
+	if (cx < b_left * GRID_SIZE) cx = b_left * GRID_SIZE;
+	if (cx > b_right * GRID_SIZE - s_width)
+		cx = b_right * GRID_SIZE - s_width;
 
-	CGame::GetInstance()->SetCamPos(min(cx, b_right*GRID_SIZE - (GRID_SIZE*16)), 0.0f /*cy*/);
+	if (cy < b_top * GRID_SIZE)
+		cy = b_top * GRID_SIZE;
+
+	CMario* mario = dynamic_cast<CMario*>(player);
+	//if (!mario->IsFlying())
+	//{
+	//	if (cy > b_bottom * GRID_SIZE - s_height - s_height/2 - GRID_SIZE*2)
+	//		cy = b_bottom * GRID_SIZE - s_height;
+
+	//}
+	//else 
+	//{
+	//	if (cy > b_bottom * GRID_SIZE - s_height)
+	//		cy = b_bottom * GRID_SIZE - s_height;
+	//}
+	if (cy > b_bottom * GRID_SIZE - s_height)
+		cy = b_bottom * GRID_SIZE - s_height;
+	CGame::GetInstance()->SetCamPos(cx, cy);
 
 	PurgeDeletedObjects();
 }

@@ -14,23 +14,18 @@
 #define MARIO_ACCEL_WALK_X	0.0002f
 #define MARIO_ACCEL_RUN_X	0.0007f
 #define MARIO_ACCEL_WALK_TO_RUN	(MARIO_ACCEL_WALK_X)
-#define MARIO_ACCEL_RUN_SEGMENT_1 (MARIO_ACCEL_WALK_TO_RUN + 0.00003)
-#define MARIO_ACCEL_RUN_SEGMENT_2 (MARIO_ACCEL_RUN_SEGMENT_1 + 0.00003)
-#define MARIO_ACCEL_RUN_SEGMENT_3 (MARIO_ACCEL_RUN_SEGMENT_2 + 0.00003)
-#define MARIO_ACCEL_RUN_SEGMENT_4 (MARIO_ACCEL_RUN_SEGMENT_3 + 0.00003)
-#define MARIO_ACCEL_RUN_SEGMENT_5 (MARIO_ACCEL_RUN_SEGMENT_4 + 0.00003)
 
 #define MARIO_DECCEL_WALK	0.00025f
 #define MARIO_DECCEL_RUN	(MARIO_DECCEL_WALK*2)
 
 
 
-#define MARIO_JUMP_SPEED_Y			0.38f
-#define MARIO_JUMP_RUN_SPEED_Y		0.45f
-#define MARIO_JUMP_DEFLECT_SPEED	0.3f
+#define MARIO_JUMP_SPEED_Y			0.3f
+#define MARIO_JUMP_RUN_SPEED_Y		0.33f
+#define MARIO_JUMP_DEFLECT_SPEED	0.2f
 
 #define MARIO_GRAVITY					0.002f
-#define MARIO_ON_AIR_DECLERATION		0.001f
+#define MARIO_ON_AIR_DECLERATION		0.0005f
 
 
 
@@ -206,6 +201,8 @@ class CMario : public CGameObject
 
 	CGameObject* koopaShell;
 
+	BOOLEAN isFlying;
+
 	void OnCollisionWithFire(LPCOLLISIONEVENT e);
 	void OnCollisionWithSuperLeaf(LPCOLLISIONEVENT e);
 	void OnCollisionWithSuperMushroom(LPCOLLISIONEVENT e);
@@ -239,6 +236,7 @@ public:
 		readyToHold = FALSE;
 		isHolding = FALSE;
 		koopaShell = nullptr;
+		isFlying = FALSE;
 	}
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	void Render();
@@ -261,4 +259,6 @@ public:
 	void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 
 	void HitByEnemy();
+
+	int IsFlying() { return isFlying; }
 };
