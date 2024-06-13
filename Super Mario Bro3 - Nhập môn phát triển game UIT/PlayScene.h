@@ -24,6 +24,7 @@ protected:
 	vector<LPBGELEMENT> background;
 	int b_left, b_right, b_top, b_bottom;
 
+	BOOLEAN isCamYPosAdjust;
 
 	void _ParseSection_SPRITES(string line);
 	void _ParseSection_ANIMATIONS(string line);

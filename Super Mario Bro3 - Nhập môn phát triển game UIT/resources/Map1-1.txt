@@ -110,7 +110,7 @@ resources\koopa.txt
 
 
 # MARIO
-0	500	160
+0	10	160
 
 [BACKGROUND]
 #x, y below represent for grid cell

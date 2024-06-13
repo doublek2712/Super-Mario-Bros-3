@@ -34,6 +34,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 {
 	player = NULL;
 	key_handler = new CSampleKeyHandler(this);
+	isCamYPosAdjust = FALSE;
 }
 
 
@@ -401,19 +402,32 @@ void CPlayScene::Update(DWORD dt)
 		cy = b_top * GRID_SIZE;
 
 	CMario* mario = dynamic_cast<CMario*>(player);
-	//if (!mario->IsFlying())
-	//{
-	//	if (cy > b_bottom * GRID_SIZE - s_height - s_height/2 - GRID_SIZE*2)
-	//		cy = b_bottom * GRID_SIZE - s_height;
-
-	//}
-	//else 
-	//{
-	//	if (cy > b_bottom * GRID_SIZE - s_height)
-	//		cy = b_bottom * GRID_SIZE - s_height;
-	//}
-	if (cy > b_bottom * GRID_SIZE - s_height)
-		cy = b_bottom * GRID_SIZE - s_height;
+	if (!mario->IsFlying())
+	{
+		if (!isCamYPosAdjust)
+		{
+			if (cy > b_bottom * GRID_SIZE - s_height - s_height / 2 - GRID_SIZE * 2)
+				cy = b_bottom * GRID_SIZE - s_height;
+		}
+		else
+		{
+			if (cy > b_bottom * GRID_SIZE - s_height)
+			{
+				cy = b_bottom * GRID_SIZE - s_height;
+				isCamYPosAdjust = FALSE;
+			}
+		}
+	}
+	else 
+	{
+		if (cy > b_bottom * GRID_SIZE - s_height)
+			cy = b_bottom * GRID_SIZE - s_height;
+		else {
+			isCamYPosAdjust = TRUE;
+		}
+	}
+	//if (cy > b_bottom * GRID_SIZE - s_height)
+	//	cy = b_bottom * GRID_SIZE - s_height;
 	CGame::GetInstance()->SetCamPos(cx, cy);
 
 	PurgeDeletedObjects();
