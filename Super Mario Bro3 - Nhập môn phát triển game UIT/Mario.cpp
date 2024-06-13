@@ -652,10 +652,23 @@ void CMario::SetState(int state)
 		isKicking = TRUE;
 		kick_start = GetTickCount64();
 		break;
-
+	case MARIO_STATE_READY_TO_HOLD:
+		readyToHold = TRUE;
+		break;
 	case MARIO_STATE_HOLDING:
 		readyToHold = FALSE;
 		isHolding = TRUE;
+		break;
+
+	case MARIO_STATE_RELEASE_HOLD:
+		if (isHolding)
+		{
+			isHolding = FALSE;
+			CKoopa* koopa = dynamic_cast<CKoopa*>(koopaShell);
+			SetState(MARIO_STATE_KICK);
+			koopa->KickedByMario(nx);
+			koopaShell = nullptr;
+		}
 		break;
 
 	case MARIO_STATE_ACCEL_TO_RUN_LEFT:
@@ -762,19 +775,4 @@ int CMario::GetLevel()
 {
 	return this->level;
 }
-void CMario::Hold()
-{
-	readyToHold = TRUE;
-}
-void CMario::ReleaseHold()
-{
-	if (isHolding)
-	{
-		isHolding = FALSE;
-		CKoopa* koopa = dynamic_cast<CKoopa*>(koopaShell);
-		SetState(MARIO_STATE_KICK);
-		koopa->KickedByMario(nx);
-		koopaShell = nullptr;
-	}
 
-}
