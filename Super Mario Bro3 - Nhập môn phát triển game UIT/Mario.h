@@ -9,25 +9,23 @@
 #define MARIO_WALKING_SPEED		0.1f
 #define MARIO_RUNNING_SPEED		0.2f
 
-
-
 #define MARIO_ACCEL_WALK_X	0.0002f
 #define MARIO_ACCEL_RUN_X	0.0007f
 #define MARIO_ACCEL_WALK_TO_RUN	(MARIO_ACCEL_WALK_X)
 
-#define MARIO_DECCEL_WALK	0.00025f
-#define MARIO_DECCEL_RUN	(MARIO_DECCEL_WALK*2)
-
-
+#define MARIO_DECEL_WALK	0.00025f
+#define MARIO_DECEL_RUN	(MARIO_DECEL_WALK*2)
 
 #define MARIO_JUMP_SPEED_Y			0.3f
 #define MARIO_JUMP_RUN_SPEED_Y		0.33f
 #define MARIO_JUMP_DEFLECT_SPEED	0.2f
 
+#define MARIO_WAGGING_FALL_SPEED	0.01f
+
 #define MARIO_GRAVITY					0.002f
 #define MARIO_ON_AIR_DECLERATION		0.0005f
 
-
+#pragma region MARIO_STATE_ID
 
 #define MARIO_STATE_DIE				-10
 #define MARIO_STATE_IDLE			0
@@ -52,7 +50,7 @@
 #define MARIO_STATE_ACCEL_TO_RUN_LEFT	900
 #define MARIO_STATE_ACCEL_TO_RUN_RIGHT	901
 
-
+#pragma endregion
 
 #pragma region ANIMATION_ID
 
@@ -132,6 +130,10 @@
 
 #define ID_ANI_MARIO_RACCOON_JUMP_WALK_RIGHT 2000
 #define ID_ANI_MARIO_RACCOON_JUMP_WALK_LEFT 2001
+#define ID_ANI_MARIO_RACCOON_JUMP_FALLING_RIGHT 2010
+#define ID_ANI_MARIO_RACCOON_JUMP_FALLING_LEFT 2011
+#define ID_ANI_MARIO_RACCOON_TAIL_WAGGING_RIGHT 2020
+#define ID_ANI_MARIO_RACCOON_TAIL_WAGGING_LEFT 2021
 
 #define ID_ANI_MARIO_RACCOON_JUMP_RUN_RIGHT 2100
 #define ID_ANI_MARIO_RACCOON_JUMP_RUN_LEFT 2101
@@ -202,6 +204,7 @@ class CMario : public CGameObject
 	CGameObject* koopaShell;
 
 	BOOLEAN isFlying;
+	BOOLEAN isWagging;
 
 	void OnCollisionWithFire(LPCOLLISIONEVENT e);
 	void OnCollisionWithSuperLeaf(LPCOLLISIONEVENT e);
@@ -237,6 +240,7 @@ public:
 		isHolding = FALSE;
 		koopaShell = nullptr;
 		isFlying = FALSE;
+		isWagging = FALSE;
 	}
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	void Render();
