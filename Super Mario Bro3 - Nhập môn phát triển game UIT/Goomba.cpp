@@ -8,8 +8,10 @@ CGoomba::CGoomba(float x, float y):CGameObject(x, y)
 	this->ay = GOOMBA_GRAVITY;
 	die_start = -1;
 	hit_nx = 0;
-	isActived = false;
-	isFellDown = false;
+	nx = -1;
+	isActived = FALSE;
+	isFellDown = FALSE;
+	isOnPlatform = FALSE;
 	SetState(GOOMBA_STATE_WALKING);
 }
 
@@ -39,16 +41,22 @@ void CGoomba::OnNoCollision(DWORD dt)
 
 void CGoomba::OnCollisionWith(LPCOLLISIONEVENT e)
 {
+	if (dynamic_cast<CGoomba*>(e->obj) && e->nx != 0) {
+		/*if(e->obj->IsCollidable())
+			vx = -vx;*/
+		return;
+	}
 	if (!e->obj->IsBlocking()) return; 
-	if (dynamic_cast<CGoomba*>(e->obj)) return; 
 
-	if (e->ny != 0 )
+	if (e->ny != 0)
 	{
 		vy = 0;
+		if (e->ny < 0) isOnPlatform = true;
 	}
 	else if (e->nx != 0)
 	{
 		vx = -vx;
+		nx = -nx;
 	}
 }
 
@@ -96,11 +104,18 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	}
 
 	//
-	if ( ((state==GOOMBA_STATE_DIE) || (state == GOOMBA_STATE_HIT)) && (GetTickCount64() - die_start > GOOMBA_DIE_TIMEOUT) )
+	if ( (state==GOOMBA_STATE_DIE) && (GetTickCount64() - die_start > GOOMBA_DIE_TIMEOUT) )
 	{
 		isDeleted = true;
 		return;
 	}
+	if ((state == GOOMBA_STATE_HIT) && (GetTickCount64() - die_start > GOOMBA_HIT_TIMEOUT))
+	{
+		isDeleted = true;
+		return;
+	}
+
+	isOnPlatform = FALSE;
 
 	CGameObject::Update(dt, coObjects);
 	CCollision::GetInstance()->Process(this, dt, coObjects);
@@ -138,7 +153,7 @@ void CGoomba::SetState(int state)
 			ay = 0; 
 			break;
 		case GOOMBA_STATE_WALKING: 
-			vx = -GOOMBA_WALKING_SPEED;
+			vx = nx * GOOMBA_WALKING_SPEED;
 			break;
 		case GOOMBA_STATE_HIT:
 			die_start = GetTickCount64();

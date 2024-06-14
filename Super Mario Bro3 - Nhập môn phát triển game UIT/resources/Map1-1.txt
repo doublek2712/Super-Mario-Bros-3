@@ -47,6 +47,9 @@ resources\koopa.txt
 2	816	144
 2	864	144
 
+#GOOMBA
+10	900	140
+
 #KOOPA
 3	592	120	1
 

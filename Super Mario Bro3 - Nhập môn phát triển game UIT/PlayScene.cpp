@@ -21,6 +21,7 @@
 #include "Wood.h"
 #include "VenusPiranha.h"
 #include "Koopa.h"
+#include "ParaGoomba.h"
 
 #include "SampleKeyEventHandler.h"
 
@@ -274,6 +275,9 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		
 		break;
 	}
+	case OBJECT_TYPE_PARA_GOOMBA: 
+		obj = new CParaGoomba(x, y);
+		break;
 	default:
 		DebugOut(L"[ERROR] Invalid object type: %d\n", object_type);
 		return;

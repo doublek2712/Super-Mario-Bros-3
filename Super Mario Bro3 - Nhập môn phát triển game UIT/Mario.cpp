@@ -246,7 +246,7 @@ void CMario::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
 
 void CMario::OnCollisionWithCoin(LPCOLLISIONEVENT e)
 {
-	//if (!e->obj->IsCollidable()) return;
+	if (!e->obj->IsCollidable()) return;
 	e->obj->Delete();
 	coin++;
 }
