@@ -142,10 +142,20 @@ void CMario::OnCollisionWithKoopa(LPCOLLISIONEVENT e)
 		{
 			if (koopa->GetState() != KOOPA_STATE_SHELL_IDLE)
 			{
-				HitByEnemy();
+				if (isTailAttacking)
+				{
+					koopa->GetHit(nx);
+				}
+				else
+					HitByEnemy();
 			}
 			else
 			{
+				if (isTailAttacking)
+				{
+					koopa->GetHit(nx);
+				}
+				else
 				if (readyToHold)
 				{
 					koopa->HoldByMario(&x, &y, &nx);
@@ -217,13 +227,18 @@ void CMario::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
 			vy = -MARIO_JUMP_DEFLECT_SPEED;
 		}
 	}
-	else // hit by Goomba
+	else // hit by Goomba or hit Goomba by tail
 	{
 		if (untouchable == 0)
 		{
 			if (goomba->GetState() != GOOMBA_STATE_DIE && goomba->IsCollidable())
 			{
-				HitByEnemy();
+				if (isTailAttacking)
+				{
+					goomba->SetState(GOOMBA_STATE_HIT);
+				}
+				else 
+					HitByEnemy();
 			}
 		}
 	}
@@ -231,7 +246,7 @@ void CMario::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
 
 void CMario::OnCollisionWithCoin(LPCOLLISIONEVENT e)
 {
-	if (!e->obj->IsCollidable()) return;
+	//if (!e->obj->IsCollidable()) return;
 	e->obj->Delete();
 	coin++;
 }
@@ -589,7 +604,7 @@ void CMario::Render()
 
 	animations->Get(aniId)->Render(x, y);
 
-
+	//RenderBoundingBox();
 	//DebugOutTitle(L"Coins: %d. x = %f, y = %f", coin, x, y);
 }
 
@@ -653,7 +668,7 @@ void CMario::SetState(int state)
 		else if (abs(this->vx) == MARIO_RUNNING_SPEED && level == MARIO_LEVEL_RACCOON)
 		{
 			isFlying = TRUE;
-			vy = -MARIO_JUMP_RUN_SPEED_Y;
+			vy = -MARIO_FLY_SPEED;
 		}
 		else if (level == MARIO_LEVEL_RACCOON)
 		{
@@ -702,6 +717,7 @@ void CMario::SetState(int state)
 		break;
 
 	case MARIO_STATE_RELEASE_HOLD:
+		readyToHold = FALSE;
 		if (isHolding)
 		{
 			isHolding = FALSE;
@@ -735,6 +751,7 @@ void CMario::SetState(int state)
 	case MARIO_STATE_TAIL_ATTACK:
 		isTailAttacking = TRUE;
 		tail_attack_start = GetTickCount64();
+
 		break;
 
 	case MARIO_STATE_IDLE:
@@ -765,9 +782,10 @@ void CMario::GetBoundingBox(float& left, float& top, float& right, float& bottom
 		}
 		else
 		{
-			left = x - MARIO_BIG_BBOX_WIDTH / 2;
+			float width = (!isTailAttacking) ? MARIO_BIG_BBOX_WIDTH : MARIO_RACCOON_TAIL_ATTACK_WIDTH;
+			left = x - width / 2;
 			top = y - MARIO_BIG_BBOX_HEIGHT / 2;
-			right = left + MARIO_BIG_BBOX_WIDTH;
+			right = left + width;
 			bottom = top + MARIO_BIG_BBOX_HEIGHT;
 		}
 

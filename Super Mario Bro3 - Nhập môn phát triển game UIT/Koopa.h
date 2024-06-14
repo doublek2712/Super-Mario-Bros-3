@@ -4,6 +4,7 @@
 #define KOOPA_GRAVITY 0.002f
 #define KOOPA_WALKING_SPEED 0.03f
 #define KOOPA_SHELL_MOVE 0.24f
+#define KOOMBA_HIT_DEFLECT_SPEED 0.4f
 
 #define KOOPA_BBOX_WIDTH 16
 #define KOOPA_BBOX_HEIGHT 26
@@ -11,9 +12,11 @@
 
 #define KOOPA_STATE_WALKING 100
 #define KOOPA_STATE_SHELL_IDLE 200
+#define KOOPA_STATE_SHELL_IDLE_HIT 201
 #define KOOPA_STATE_SHELL_MOVE 300
 #define KOOPA_STATE_HELD 400
 #define KOOPA_STATE_RELEASE_HELD 400
+#define KOOPA_STATE_HIT	500
 
 #define ID_ANI_KOOPA_GREEN_WALKING_LEFT 8001
 #define ID_ANI_KOOPA_GREEN_WALKING_RIGHT 8002
@@ -63,6 +66,7 @@ public:
 	CKoopa(float x, float y, BOOLEAN block);
 	virtual void SetState(int state);
 	void KickedByMario(int nx);
+	void GetHit(int nx);
 	void HoldByMario(float* x, float* y, int* nx);
 	void UpdatePositionFollowMario();
 };

@@ -77,6 +77,11 @@ void CKoopa::OnCollisionWithOtherUnit(LPCOLLISIONEVENT e)
 			CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
 			goomba->SetState(GOOMBA_STATE_HIT);
 		}
+		else if (dynamic_cast<CKoopa*>(e->obj) )
+		{
+			CKoopa* koopa = dynamic_cast<CKoopa*>(e->obj);
+			koopa->GetHit(nx);
+		}
 	}
 	
 }
@@ -134,6 +139,13 @@ void CKoopa::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			nx = -nx;
 		}
 	}
+
+	if (state == KOOPA_STATE_SHELL_IDLE_HIT)
+	{
+		if (isOnPlatform)
+			SetState(KOOPA_STATE_SHELL_IDLE);
+	}
+
 	isOnPlatform = false;
 
 	if(!isHeld)
@@ -149,7 +161,10 @@ void CKoopa::Render()
 	int aniId = -1;
 	if (isBlockByPlatform) {
 		aniId = (vx < 0) ? ID_ANI_KOOPA_RED_WALKING_LEFT : ID_ANI_KOOPA_RED_WALKING_RIGHT;
-		if (state == KOOPA_STATE_SHELL_IDLE || state == KOOPA_STATE_HELD)
+		if (state == KOOPA_STATE_SHELL_IDLE || 
+			state == KOOPA_STATE_HELD || 
+			state == KOOPA_STATE_HIT ||
+			state == KOOPA_STATE_SHELL_IDLE_HIT)
 			aniId = ID_ANI_KOOPA_RED_SHELL_IDLE;
 		else 
 		if (state == KOOPA_STATE_SHELL_MOVE)
@@ -191,6 +206,12 @@ void CKoopa::SetState(int state)
 	case KOOPA_STATE_HELD:
 		isHeld = TRUE;
 		break;
+	case KOOPA_STATE_HIT:
+		vy = -KOOMBA_HIT_DEFLECT_SPEED;
+		vx = nx * KOOPA_WALKING_SPEED;
+		isOnPlatform = FALSE;
+		SetState(KOOPA_STATE_SHELL_IDLE_HIT);
+		break;
 	}
 }
 
@@ -198,6 +219,11 @@ void CKoopa::KickedByMario(int nx)
 {
 	this->nx = nx;
 	SetState(KOOPA_STATE_SHELL_MOVE);
+}
+void CKoopa::GetHit(int nx)
+{
+	this->nx = nx;
+	SetState(KOOPA_STATE_HIT);
 }
 
 void CKoopa::HoldByMario(float* x, float* y, int* nx)

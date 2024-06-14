@@ -191,7 +191,11 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		delete tmp;
 		break;
 	}
-	case OBJECT_TYPE_COIN: obj = new CCoin(x, y); break;
+	case OBJECT_TYPE_COIN: {
+		gridToreal(x, y);
+		obj = new CCoin(x, y); 
+		break;
+	}
 
 	case OBJECT_TYPE_PLATFORM:
 	{

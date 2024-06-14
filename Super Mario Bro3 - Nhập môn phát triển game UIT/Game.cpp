@@ -220,7 +220,7 @@ void CGame::Draw(float x, float y, LPTEXTURE tex, RECT* rect, float alpha, int s
 	D3DXMATRIX matTranslation;
 
 	// Create the translation matrix
-	D3DXMatrixTranslation(&matTranslation, x, (backBufferHeight - y), 0.1f);
+	D3DXMatrixTranslation(&matTranslation, x + WD_WIDTH_BUFFER, (backBufferHeight - y - WD_HEIGHT_BUFFER), 0.1f);
 
 	// Scale the sprite to its correct width and height because by default, DirectX draws it with width = height = 1.0f 
 	D3DXMATRIX matScaling;
