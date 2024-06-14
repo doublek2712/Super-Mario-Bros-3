@@ -209,7 +209,7 @@ void CMario::OnCollisionWithQBlock(LPCOLLISIONEVENT e) {
 		if (block->GetState() == BLOCK_STATE_EMPTY)
 			return;
 		if (block->GetState() == BLOCK_STATE_IDLE) {
-			block->SetState(BLOCK_STATE_COLLIDED);
+			block->SetState(BLOCK_STATE_COLLIDED_BELOW);
 		}
 	}
 }

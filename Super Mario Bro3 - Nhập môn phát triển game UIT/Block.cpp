@@ -7,10 +7,15 @@
 void CBlock::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects) {
 
 	y += vy * dt;
+
+	if (state == BLOCK_STATE_COLLIDED_BELOW || state == BLOCK_STATE_COLLIDED_SIDE)
+	{
+		SetState(BLOCK_STATE_EMPTY);
+	}
+	
 	if (y > def_y) {
 		y = def_y;
 		vy = 0;
-		this->SetState(BLOCK_STATE_EMPTY);
 	}
 	if (y < def_y) {
 		vy += BLOCK_BOUNCE_RECURE * dt;
@@ -24,7 +29,7 @@ void CBlock::Render()
 
 	if (state == BLOCK_STATE_EMPTY)
 		aniId = ID_ANI_EMPTY_BLOCK;
-	else if (state == BLOCK_STATE_COLLIDED || state == BLOCK_STATE_IDLE)
+	else
 		aniId = ID_ANI_Q_BLOCK;
 
 	animations->Get(aniId)->Render(x,y);
@@ -43,14 +48,19 @@ void CBlock::GetBoundingBox(float &l, float &t, float &r, float &b)
 void CBlock::SetState(int state) {
 	if (this->state == BLOCK_STATE_EMPTY) return;
 	switch (state) {
-	case BLOCK_STATE_COLLIDED:
+	case BLOCK_STATE_COLLIDED_BELOW:
 	{
 		vy = -BLOCK_BOUNCE_FORCE;
-		item->SetState(CONTAINED_STATE_ACTIVE);
+		if(!item->IsDeleted()) // handle item delete to avoid unexpected error 
+			item->SetState(CONTAINED_STATE_ACTIVE);
 		break;
 	}
-	case BLOCK_STATE_EMPTY:
+	case BLOCK_STATE_COLLIDED_SIDE:
+	{
+		if (!item->IsDeleted()) // handle item delete to avoid unexpected error 
+			item->SetState(CONTAINED_STATE_ACTIVE);
 		break;
+	}
 	}
 
 	CGameObject::SetState(state);

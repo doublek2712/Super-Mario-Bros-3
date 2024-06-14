@@ -6,6 +6,7 @@
 #include "Mario.h"
 #include "Goomba.h"
 #include "VenusPiranha.h"
+#include "Wood.h"
 CKoopa::CKoopa(float x, float y, BOOLEAN block) :CGameObject(x, y)
 {
 	this->ax = 0;
@@ -16,6 +17,7 @@ CKoopa::CKoopa(float x, float y, BOOLEAN block) :CGameObject(x, y)
 	this->m_x = nullptr;
 	this->m_y = nullptr;
 	this->isHeld = FALSE;
+	this->isKicked = FALSE;
 	SetState(KOOPA_STATE_WALKING);
 }
 
@@ -91,7 +93,7 @@ void CKoopa::OnCollisionWithPlatform(LPCOLLISIONEVENT e)
 	if (e->ny < 0)
 	{
 		isOnBlock = FALSE;
-		CGameObject* platform = dynamic_cast<CGameObject*>(e->obj);
+		CGameObject* platform = e->obj;
 
 		float l, r, t, b;
 		platform->GetBoundingBox(l, t, r, b);
@@ -103,12 +105,13 @@ void CKoopa::OnCollisionWithPlatform(LPCOLLISIONEVENT e)
 }
 void CKoopa::OnCollisionWithBlock(LPCOLLISIONEVENT e)
 {
+	
 	if (e->ny < 0)
 	{
-		CGameObject* block = dynamic_cast<CGameObject*>(e->obj);
+		
 
 		float l, r, t, b;
-		block->GetBoundingBox(l, t, r, b);
+		e->obj->GetBoundingBox(l, t, r, b);
 		//DebugOut(L"%f\n", r);
 		if (!isOnBlock)
 		{
@@ -122,6 +125,15 @@ void CKoopa::OnCollisionWithBlock(LPCOLLISIONEVENT e)
 			r_bounded = max(r, r_bounded);
 
 		}
+	}
+	else if (e->nx != 0)
+	{
+		if (dynamic_cast<CWood*>(e->obj))
+			return;
+
+		CBlock* block = dynamic_cast<CBlock*>(e->obj);
+		if(isKicked)
+			block->SetState(BLOCK_STATE_COLLIDED_SIDE);
 	}
 	
 }
@@ -192,6 +204,7 @@ void CKoopa::SetState(int state)
 	{
 	case KOOPA_STATE_WALKING:
 		vx = -KOOPA_WALKING_SPEED;
+		isKicked = FALSE;
 		break;
 	case KOOPA_STATE_SHELL_IDLE:
 		vx = 0;
@@ -218,6 +231,7 @@ void CKoopa::SetState(int state)
 void CKoopa::KickedByMario(int nx)
 {
 	this->nx = nx;
+	isKicked = TRUE;
 	SetState(KOOPA_STATE_SHELL_MOVE);
 }
 void CKoopa::GetHit(int nx)
