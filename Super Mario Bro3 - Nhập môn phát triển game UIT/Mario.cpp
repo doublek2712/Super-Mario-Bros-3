@@ -53,13 +53,18 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		untouchable_start = 0;
 		untouchable = 0;
 	}
-
+	// reset kick timer 
 	if (GetTickCount64() - kick_start > MARIO_KICK_ANI_TIME)
 	{
 		kick_start = 0;
 		isKicking = FALSE;
 	}
-
+	// reset tail attack timer
+	if (GetTickCount64() - tail_attack_start > MARIO_TAIL_ATTACK_TIME)
+	{
+		tail_attack_start = 0;
+		isTailAttacking = FALSE;
+	}
 
 	isOnPlatform = false;
 
@@ -457,6 +462,11 @@ int CMario::GetAniIdBig()
 int CMario::GetAniIdRaccoon()
 {
 	int aniId = -1;
+	if (isTailAttacking)
+	{
+		aniId = (nx > 0) ? ID_ANI_MARIO_RACCOON_TAIL_ATTACK_RIGHT : ID_ANI_MARIO_RACCOON_TAIL_ATTACK_LEFT;
+	}
+	else
 	if (!isOnPlatform)
 	{
 		if (isHolding)
@@ -466,7 +476,7 @@ int CMario::GetAniIdRaccoon()
 		else
 		if (isWagging)
 		{
-			if (nx >= 0)
+			if (nx > 0)
 				aniId = ID_ANI_MARIO_RACCOON_TAIL_WAGGING_RIGHT;
 			else
 				aniId = ID_ANI_MARIO_RACCOON_TAIL_WAGGING_LEFT;
@@ -474,7 +484,7 @@ int CMario::GetAniIdRaccoon()
 		else
 		if (isFlying)
 		{
-			if (nx >= 0)
+			if (nx > 0)
 				aniId = ID_ANI_MARIO_RACCOON_FLY_TAIL_WAGGING_RIGHT;
 			else
 				aniId = ID_ANI_MARIO_RACCOON_FLY_TAIL_WAGGING_LEFT;
@@ -482,7 +492,7 @@ int CMario::GetAniIdRaccoon()
 		else
 		if (abs(vx) == MARIO_RUNNING_SPEED)
 		{
-			if (nx >= 0)
+			if (nx > 0)
 				aniId = ID_ANI_MARIO_RACCOON_JUMP_RUN_RIGHT;
 			else
 				aniId = ID_ANI_MARIO_RACCOON_JUMP_RUN_LEFT;
@@ -720,6 +730,11 @@ void CMario::SetState(int state)
 		else
 			ax = MARIO_DECEL_RUN;
 		nx = 1;
+		break;
+
+	case MARIO_STATE_TAIL_ATTACK:
+		isTailAttacking = TRUE;
+		tail_attack_start = GetTickCount64();
 		break;
 
 	case MARIO_STATE_IDLE:

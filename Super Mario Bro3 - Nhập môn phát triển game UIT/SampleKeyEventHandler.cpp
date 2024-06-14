@@ -32,6 +32,8 @@ void CSampleKeyHandler::OnKeyDown(int KeyCode)
 		mario->SetState(MARIO_STATE_DIE);
 		break;
 	case DIK_A:
+		if (mario->GetLevel() == MARIO_LEVEL_RACCOON)
+			mario->SetState(MARIO_STATE_TAIL_ATTACK);
 		mario->SetState(MARIO_STATE_READY_TO_HOLD);
 		break;
 	}

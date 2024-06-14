@@ -258,7 +258,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 		int height = atoi(tokens[3].c_str());
 		x += 8; 
-		y += (height > 1)? 8 : 4;
+		y += (height > 1)? ( VENUS_BBOX_HEIGHT_TALL - GRID_SIZE ) / 2 : (VENUS_BBOX_HEIGHT_SHORT - GRID_SIZE) / 2;
 		
 		obj = new CVenusPiranha(x, y, height);
 		break;
@@ -395,8 +395,8 @@ void CPlayScene::Update(DWORD dt)
 	game->GetScreenSize(s_width, s_height);
 
 	if (cx < b_left * GRID_SIZE) cx = b_left * GRID_SIZE;
-	if (cx > b_right * GRID_SIZE - s_width)
-		cx = b_right * GRID_SIZE - s_width;
+	if (cx > b_right * GRID_SIZE + GRID_SIZE - s_width)
+		cx = b_right * GRID_SIZE + GRID_SIZE - s_width;
 
 	if (cy < b_top * GRID_SIZE)
 		cy = b_top * GRID_SIZE;

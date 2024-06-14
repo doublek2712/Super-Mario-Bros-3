@@ -56,6 +56,6 @@ LPCWSTR ToLPCWSTR(string st)
 *	Convert coordinates on grid to real coordinates
 */
 void gridToreal(float& x, float& y) {
-	x = x * GRID_SIZE + WD_WIDTH_BUFFER;
-	y = y * GRID_SIZE + WD_HEIGHT_BUFFER;
+	x = x * GRID_SIZE;
+	y = y * GRID_SIZE;
 }

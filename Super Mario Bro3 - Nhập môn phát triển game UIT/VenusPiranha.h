@@ -3,8 +3,8 @@
 #include "Configs.h"
 
 #define VENUS_BBOX_WIDTH 12
-#define VENUS_BBOX_HEIGHT_TALL 28
-#define VENUS_BBOX_HEIGHT_SHORT 20
+#define VENUS_BBOX_HEIGHT_TALL 32
+#define VENUS_BBOX_HEIGHT_SHORT 24
 
 #define VENUS_FIRE_RANGE 96
 
@@ -42,8 +42,6 @@ class CVenusPiranha : public CGameObject
 	ULONGLONG sleep_start;
 	int height;
 
-	int GetTallID();
-	int GetShortID();
 public:
 	CVenusPiranha(float x, float y, int height): CGameObject(x, y) {
 

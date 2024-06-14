@@ -1,5 +1,5 @@
 #include "Sprite.h"
-
+#include "Configs.h"
 CSprite::CSprite(int id, int left, int top, int right, int bottom, LPTEXTURE tex)
 {
 	this->id = id;
@@ -40,11 +40,15 @@ void CSprite::Draw(float x, float y, BOOLEAN flipX) // FALSE = do not flip, TRUE
 	cy = (FLOAT)floor(cy);
 
 	D3DXMATRIX matTranslation;
-	
+
 	x = (FLOAT)floor(x);
 	y = (FLOAT)floor(y);
 
-	D3DXMatrixTranslation(&matTranslation, x - cx, g->GetBackBufferHeight() - y + cy, 0.1f);
+	D3DXMatrixTranslation(
+		&matTranslation, 
+		x + WD_WIDTH_BUFFER - cx, 
+		g->GetBackBufferHeight() - y + cy - WD_HEIGHT_BUFFER, 
+		0.1f);
 
 	D3DXMATRIX matFlip;
 

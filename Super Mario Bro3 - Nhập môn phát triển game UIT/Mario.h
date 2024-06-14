@@ -50,6 +50,8 @@
 #define MARIO_STATE_ACCEL_TO_RUN_LEFT	900
 #define MARIO_STATE_ACCEL_TO_RUN_RIGHT	901
 
+#define MARIO_STATE_TAIL_ATTACK		1000
+
 #pragma endregion
 
 #pragma region ANIMATION_ID
@@ -157,6 +159,9 @@
 #define ID_ANI_MARIO_RACCOON_HOLD_RIGHT_WALKING 2326
 #define ID_ANI_MARIO_RACCOON_HOLD_RIGHT_JUMP 2331
 
+#define ID_ANI_MARIO_RACCOON_TAIL_ATTACK_LEFT 2401
+#define ID_ANI_MARIO_RACCOON_TAIL_ATTACK_RIGHT 2402
+
 #pragma endregion
 
 #define GROUND_Y 160.0f
@@ -179,8 +184,9 @@
 #define MARIO_SMALL_BBOX_HEIGHT 12
 
 
-#define MARIO_UNTOUCHABLE_TIME 3000
-#define MARIO_KICK_ANI_TIME 300
+#define MARIO_UNTOUCHABLE_TIME	3000
+#define MARIO_KICK_ANI_TIME		300
+#define MARIO_TAIL_ATTACK_TIME	400
 
 class CMario : public CGameObject
 {
@@ -192,11 +198,13 @@ class CMario : public CGameObject
 	int level;
 	int untouchable;
 	ULONGLONG untouchable_start;
+	ULONGLONG kick_start;
+	ULONGLONG tail_attack_start;
+
 	BOOLEAN isOnPlatform;
 	int coin;
 
 	BOOLEAN isKicking;
-	ULONGLONG kick_start;
 
 	BOOLEAN readyToHold;
 	BOOLEAN isHolding;
@@ -205,6 +213,7 @@ class CMario : public CGameObject
 
 	BOOLEAN isFlying;
 	BOOLEAN isWagging;
+	BOOLEAN isTailAttacking;
 
 	void OnCollisionWithFire(LPCOLLISIONEVENT e);
 	void OnCollisionWithSuperLeaf(LPCOLLISIONEVENT e);
@@ -233,6 +242,7 @@ public:
 		untouchable = 0;
 		untouchable_start = -1;
 		kick_start = -1;
+		tail_attack_start = -1;
 		isOnPlatform = false;
 		coin = 0;
 		isKicking = FALSE;
@@ -241,6 +251,7 @@ public:
 		koopaShell = nullptr;
 		isFlying = FALSE;
 		isWagging = FALSE;
+		isTailAttacking = FALSE;
 	}
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	void Render();
