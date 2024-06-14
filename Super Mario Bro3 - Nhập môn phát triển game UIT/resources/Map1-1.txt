@@ -76,8 +76,9 @@ resources\koopa.txt
 
 
 #VENUS
-#9	22	8	2
-9	22	8	1
+9	22	8	2
+9	116	8	1
+
 #pipe			
 #id	x	y	dir	flip	length	isTrans		
 7	22	10	1	0	2	0	

@@ -18,16 +18,16 @@ void CVenusPiranha::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 	StateHandler();
 
-	if (cx + sw >= x && isTrigger == false) 
+	if (IsCamEnter() && isTrigger == false)
 	{
-		if (state == VENUS_STATE_HIDDEN) 
+		if (state == VENUS_STATE_HIDDEN && GetTickCount64() - sleep_start > VENUS_SLEEP_TIME)
 		{
 			sleep_start = -1;
 			isTrigger = true;
 			SetState(VENUS_STATE_UP);
 		}
 	}
-	if (cx + sw < x && isTrigger == true) 
+	if (!IsCamEnter() && isTrigger == true)
 	{
 		isTrigger = false;
 	}
@@ -102,6 +102,7 @@ void CVenusPiranha::StateHandler()
 
 void CVenusPiranha::Render()
 {
+
 	CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
 	CMario* player = (CMario*)scene->GetPlayer();
 	float px, py;
