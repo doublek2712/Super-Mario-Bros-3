@@ -426,8 +426,6 @@ void CPlayScene::Update(DWORD dt)
 			isCamYPosAdjust = TRUE;
 		}
 	}
-	//if (cy > b_bottom * GRID_SIZE - s_height)
-	//	cy = b_bottom * GRID_SIZE - s_height;
 	CGame::GetInstance()->SetCamPos(cx, cy);
 
 	PurgeDeletedObjects();

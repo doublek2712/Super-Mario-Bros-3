@@ -21,6 +21,9 @@ protected:
 	float x;
 	float y;
 
+	float def_x;
+	float def_y;
+
 	float vx;
 	float vy;
 
@@ -35,6 +38,7 @@ public:
 	void SetSpeed(float vx, float vy) { this->vx = vx, this->vy = vy; }
 	void GetPosition(float& x, float& y) { x = this->x; y = this->y; }
 	void GetSpeed(float& vx, float& vy) { vx = this->vx; vy = this->vy; }
+	BOOLEAN IsCamEnter();
 
 	int GetState() { return this->state; }
 	virtual void Delete() { isDeleted = true; }
@@ -43,7 +47,12 @@ public:
 	void RenderBoundingBox();
 
 	CGameObject();
-	CGameObject(float x, float y) :CGameObject() { this->x = x; this->y = y; }
+	CGameObject(float x, float y) :CGameObject() { 
+		this->x = x; 
+		this->y = y; 
+		this->def_x = x;
+		this->def_y = y;
+	}
 
 
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom) = 0;
@@ -67,6 +76,8 @@ public:
 
 	// Is this object collide with other object at certain direction ( like ColorBox )
 	virtual int IsDirectionColliable(float nx, float ny) { return 1; }
+
+	
 
 	~CGameObject();
 
