@@ -7,6 +7,8 @@
 #include "Goomba.h"
 #include "VenusPiranha.h"
 #include "Wood.h"
+#include "PlayScene.h"
+#include "ParaKoopa.h"
 CKoopa::CKoopa(float x, float y, BOOLEAN block) :CGameObject(x, y)
 {
 	this->ax = 0;
@@ -169,6 +171,20 @@ void CKoopa::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 	vy += ay * dt;
 	vx += ax * dt;
+
+	// process when koopa falls off the scene
+	CPlayScene* scene = dynamic_cast<CPlayScene*>(CGame::GetInstance()->GetCurrentScene());
+	if (scene->IsFallOff(y))
+	{
+		isActived = false;
+		x = def_x;
+		y = def_y;
+		if (dynamic_cast<CParaKoopa*>(this))
+			SetState(PARAKOOPA_STATE_FLY);
+		else
+		SetState(KOOPA_STATE_WALKING);
+		return;
+	}
 
 	if (isBlockByPlatform && state == KOOPA_STATE_WALKING)
 	{

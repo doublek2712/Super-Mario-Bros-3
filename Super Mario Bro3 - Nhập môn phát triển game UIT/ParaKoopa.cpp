@@ -64,6 +64,7 @@ void CParaKoopa::SetState(int state)
 		vy = -PARAKOOPA_FLY_SPEED;
 		vx = nx * KOOPA_WALKING_SPEED;
 		isOnPlatform = FALSE;
+		isKicked = FALSE;
 		break;
 
 	}
