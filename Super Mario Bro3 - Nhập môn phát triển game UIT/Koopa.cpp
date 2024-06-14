@@ -140,6 +140,33 @@ void CKoopa::OnCollisionWithBlock(LPCOLLISIONEVENT e)
 
 void CKoopa::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	// preprocessing
+	// process when camera enter , stay or leave
+	if (!CGame::GetInstance()->IsCamEnter(def_x, def_y)) {
+		if (!isActived)
+		{
+			trigger = TRIGGER_READY;
+			if (CGame::GetInstance()->IsRightSideOfCam(def_x))
+				vx = -KOOPA_WALKING_SPEED;
+			else
+				vx = KOOPA_WALKING_SPEED;
+		}
+	}
+	else if (trigger == TRIGGER_READY)
+	{
+		trigger = TRIGGER_TRIGGER;
+	}
+
+
+	if (!isActived && trigger == TRIGGER_TRIGGER)
+	{
+		isActived = true;
+		trigger = TRIGGER_IGNORE; // that mean the camera stay and then we don't want trigger anymore
+	}
+
+	// 
+	if (!isActived) return;
+
 	vy += ay * dt;
 	vx += ax * dt;
 
@@ -170,6 +197,8 @@ void CKoopa::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 void CKoopa::Render()
 {
+	if (!isActived) return;
+
 	int aniId = -1;
 	if (isBlockByPlatform) {
 		aniId = (vx < 0) ? ID_ANI_KOOPA_RED_WALKING_LEFT : ID_ANI_KOOPA_RED_WALKING_RIGHT;

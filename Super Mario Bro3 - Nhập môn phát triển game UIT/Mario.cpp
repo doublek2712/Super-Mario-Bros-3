@@ -13,6 +13,7 @@
 #include "FireBullet.h"
 #include "VenusPiranha.h"
 #include "Koopa.h"
+#include "ParaGoomba.h"
 
 #include "Collision.h"
 
@@ -223,7 +224,15 @@ void CMario::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
 	{
 		if (goomba->GetState() != GOOMBA_STATE_DIE && goomba->IsCollidable())
 		{
-			goomba->SetState(GOOMBA_STATE_DIE);
+			if (dynamic_cast<CParaGoomba*>(e->obj))
+			{
+				if (goomba->GetState() == PARAGOOMBA_STATE_NO_WING_WALKING)
+					goomba->SetState(GOOMBA_STATE_DIE);
+				else
+					goomba->SetState(PARAGOOMBA_STATE_NO_WING_WALKING);
+			}
+			else 
+				goomba->SetState(GOOMBA_STATE_DIE);
 			vy = -MARIO_JUMP_DEFLECT_SPEED;
 		}
 	}

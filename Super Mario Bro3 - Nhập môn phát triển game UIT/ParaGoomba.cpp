@@ -12,33 +12,36 @@ CParaGoomba::CParaGoomba(float x, float y) : CGoomba(x, y)
 void CParaGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	CGoomba::Update(dt, coObjects);
-	if (isJump && isOnPlatform && (numOfJumps < PARAGOOMBA_SMALL_JUMP_MAX))
-	{
-		vy += -PARAGOOMBA_SMALL_JUMP_SPEED;
-		numOfJumps++;
-	}
 
-	if (numOfJumps == PARAGOOMBA_SMALL_JUMP_MAX && isJump)
+	if (state != PARAGOOMBA_STATE_NO_WING_WALKING)
 	{
-		isJump = FALSE;
-		numOfJumps = 0;
-		SetState(PARAGOOMBA_STATE_FLY);
-		
-	}
+		if (isJump && isOnPlatform && (numOfJumps < PARAGOOMBA_SMALL_JUMP_MAX))
+		{
+			vy += -PARAGOOMBA_SMALL_JUMP_SPEED;
+			numOfJumps++;
+		}
 
-	if (isFlying && isOnPlatform)
-	{
-		isFlying = FALSE;
-		walk_start = GetTickCount64();
-		SetState(GOOMBA_STATE_WALKING);
-	}
+		if (numOfJumps == PARAGOOMBA_SMALL_JUMP_MAX && isJump)
+		{
+			isJump = FALSE;
+			numOfJumps = 0;
+			SetState(PARAGOOMBA_STATE_FLY);
 
+		}
 
-	if (GetTickCount64() - walk_start > PARAGOOMBA_WALK_TIMEOUT)
-	{
-		walk_start = 0;
-		if (state == GOOMBA_STATE_WALKING)
-			SetState(PARAGOOMBA_STATE_SMALL_JUMP);
+		if (isFlying && isOnPlatform)
+		{
+			isFlying = FALSE;
+			walk_start = GetTickCount64();
+			SetState(GOOMBA_STATE_WALKING);
+		}
+
+		if (GetTickCount64() - walk_start > PARAGOOMBA_WALK_TIMEOUT)
+		{
+			walk_start = 0;
+			if (state == GOOMBA_STATE_WALKING)
+				SetState(PARAGOOMBA_STATE_SMALL_JUMP);
+		}
 	}
 }
 
@@ -85,9 +88,9 @@ void CParaGoomba::GetBoundingBox(float& left, float& top, float& right, float& b
 	}
 	else
 	{
-		float bufferHeight = (state == PARAGOOMBA_STATE_NO_WING_WALKING) ? 0 : PARAGOOMBA_BBOX_BUFFER_HEIGHT;
+		float bufferHeight = (state == PARAGOOMBA_STATE_NO_WING_WALKING) ? 0 : PARAGOOMBA_BBOX_BUFFER_HEIGHT/2;
 		left = x - GOOMBA_BBOX_WIDTH / 2;
-		top = y - GOOMBA_BBOX_HEIGHT / 2 + 4;
+		top = y - GOOMBA_BBOX_HEIGHT / 2 + bufferHeight;
 		right = left + GOOMBA_BBOX_WIDTH;
 		bottom = top + GOOMBA_BBOX_HEIGHT;
 	}
@@ -104,6 +107,9 @@ void CParaGoomba::SetState(int state)
 		isFlying = TRUE;
 		vy += -PARAGOOMBA_FLY_SPEED;
 		isOnPlatform = FALSE;
+		break;
+	case PARAGOOMBA_STATE_NO_WING_WALKING:
+		vx = nx * GOOMBA_WALKING_SPEED;
 		break;
 	}
 
