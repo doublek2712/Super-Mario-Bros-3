@@ -14,6 +14,7 @@
 #include "VenusPiranha.h"
 #include "Koopa.h"
 #include "ParaGoomba.h"
+#include "ParaKoopa.h"
 
 #include "Collision.h"
 
@@ -125,6 +126,16 @@ void CMario::OnCollisionWithKoopa(LPCOLLISIONEVENT e)
 	// jump on top >> 
 	if (e->ny < 0)
 	{
+		if (dynamic_cast<CParaKoopa*>(e->obj))
+		{
+			if (koopa->GetState() == PARAKOOPA_STATE_FLY)
+			{
+				koopa->SetState(KOOPA_STATE_WALKING);
+				vy = -MARIO_JUMP_DEFLECT_SPEED;
+				return;
+			}
+		}
+
 		if (koopa->GetState() == KOOPA_STATE_WALKING)
 		{
 			koopa->SetState(KOOPA_STATE_SHELL_IDLE);

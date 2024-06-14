@@ -13,7 +13,7 @@ CKoopa::CKoopa(float x, float y, BOOLEAN block) :CGameObject(x, y)
 	this->isBlockByPlatform = block;
 	this->ay = KOOPA_GRAVITY;
 	this->isOnBlock = FALSE;
-	this->nx = 1;
+	this->nx = -1;
 	this->m_x = nullptr;
 	this->m_y = nullptr;
 	this->isHeld = FALSE;
@@ -214,7 +214,10 @@ void CKoopa::Render()
 	else
 	{
 		aniId = (vx < 0) ? ID_ANI_KOOPA_GREEN_WALKING_LEFT : ID_ANI_KOOPA_GREEN_WALKING_RIGHT;
-		if (state == KOOPA_STATE_SHELL_IDLE || state == KOOPA_STATE_HELD)
+		if (state == KOOPA_STATE_SHELL_IDLE ||
+			state == KOOPA_STATE_HELD ||
+			state == KOOPA_STATE_HIT ||
+			state == KOOPA_STATE_SHELL_IDLE_HIT)
 			aniId = ID_ANI_KOOPA_GREEN_SHELL_IDLE;
 		else
 			if (state == KOOPA_STATE_SHELL_MOVE)
@@ -232,7 +235,7 @@ void CKoopa::SetState(int state)
 	switch (state)
 	{
 	case KOOPA_STATE_WALKING:
-		vx = -KOOPA_WALKING_SPEED;
+		vx = nx * KOOPA_WALKING_SPEED;
 		isKicked = FALSE;
 		break;
 	case KOOPA_STATE_SHELL_IDLE:

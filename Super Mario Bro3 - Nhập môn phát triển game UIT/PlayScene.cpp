@@ -22,6 +22,7 @@
 #include "VenusPiranha.h"
 #include "Koopa.h"
 #include "ParaGoomba.h"
+#include "ParaKoopa.h"
 
 #include "SampleKeyEventHandler.h"
 
@@ -278,6 +279,13 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_PARA_GOOMBA: 
 		obj = new CParaGoomba(x, y);
 		break;
+	case OBJECT_TYPE_PARA_KOOPA:
+	{
+		BOOLEAN isBlock = (atoi(tokens[3].c_str()) == 0) ? FALSE : TRUE;
+		obj = new CParaKoopa(x, y, isBlock);
+
+		break;
+	}
 	default:
 		DebugOut(L"[ERROR] Invalid object type: %d\n", object_type);
 		return;

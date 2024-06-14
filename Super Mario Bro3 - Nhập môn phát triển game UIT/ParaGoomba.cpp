@@ -17,7 +17,7 @@ void CParaGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		if (isJump && isOnPlatform && (numOfJumps < PARAGOOMBA_SMALL_JUMP_MAX))
 		{
-			vy += -PARAGOOMBA_SMALL_JUMP_SPEED;
+			vy = -PARAGOOMBA_SMALL_JUMP_SPEED;
 			numOfJumps++;
 		}
 
@@ -105,7 +105,7 @@ void CParaGoomba::SetState(int state)
 		break;
 	case PARAGOOMBA_STATE_FLY:
 		isFlying = TRUE;
-		vy += -PARAGOOMBA_FLY_SPEED;
+		vy = -PARAGOOMBA_FLY_SPEED;
 		isOnPlatform = FALSE;
 		break;
 	case PARAGOOMBA_STATE_NO_WING_WALKING:
