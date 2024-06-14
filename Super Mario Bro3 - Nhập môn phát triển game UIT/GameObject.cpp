@@ -38,19 +38,6 @@ void CGameObject::RenderBoundingBox()
 	CGame::GetInstance()->Draw(x - cx, y - cy, bbox, rect.left, rect.top, rect.right, rect.bottom, 0.25f);
 }
 
-BOOLEAN CGameObject::IsCamEnter()
-{
-	CGame* game = CGame::GetInstance();
-
-	float cx, cy;
-	game->GetCamPos(cx, cy);
-
-	float sw, sh;
-	game->GetScreenSize(sw, sh);
-
-	return ((cx + sw >= x) && (cx <= x)) && ((cy <= y) && (cy + sh >= y));
-}
-
 
 CGameObject::~CGameObject()
 {

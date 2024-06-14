@@ -47,6 +47,9 @@ public:
 	LPGAMEOBJECT GetPlayer() { return player; }
 
 	void SpawnObject(LPGAMEOBJECT obj);
+	BOOLEAN IsFallOff(float obj_y) {
+		return (obj_y >= b_bottom * GRID_SIZE);
+	}
 
 	void Clear();
 	void PurgeDeletedObjects();

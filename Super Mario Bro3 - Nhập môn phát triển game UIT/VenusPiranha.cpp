@@ -18,23 +18,23 @@ void CVenusPiranha::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 	StateHandler();
 
-	if (IsCamEnter() && isTrigger == false)
+	if (CGame::GetInstance()->IsCamEnter(x, y) && isActived == false)
 	{
 		if (state == VENUS_STATE_HIDDEN && GetTickCount64() - sleep_start > VENUS_SLEEP_TIME)
 		{
 			sleep_start = -1;
-			isTrigger = true;
+			isActived = true;
 			SetState(VENUS_STATE_UP);
 		}
 	}
-	if (!IsCamEnter() && isTrigger == true)
+	if (!CGame::GetInstance()->IsCamEnter(x, y) && isActived == true)
 	{
-		isTrigger = false;
+		isActived = false;
 	}
 	if (GetTickCount64() - sleep_start > VENUS_SLEEP_TIME)
 	{
 		sleep_start = -1;
-		if (state == VENUS_STATE_HIDDEN && isTrigger)
+		if (state == VENUS_STATE_HIDDEN && isActived)
 			SetState(VENUS_STATE_UP);
 	}
 	if (GetTickCount64() - wait_start > VENUS_WAIT_TIME)
@@ -80,7 +80,7 @@ void CVenusPiranha::Reset()
 	this->vy = 0;
 	wait_start = -1;
 	sleep_start = -1;
-	isTrigger = false;
+	isActived = false;
 	y = hidden_y;
 }
 void CVenusPiranha::StateHandler() 

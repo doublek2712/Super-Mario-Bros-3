@@ -37,7 +37,7 @@
 class CVenusPiranha : public CGameObject
 {
 	float hidden_y, grow_y;
-	bool isTrigger;
+	
 	ULONGLONG wait_start;
 	ULONGLONG sleep_start;
 	int height;
@@ -55,7 +55,7 @@ public:
 		this->height = height;
 		wait_start = -1;
 		sleep_start = -1;
-		isTrigger = false;
+		isActived = false;
 	}
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	void Render();

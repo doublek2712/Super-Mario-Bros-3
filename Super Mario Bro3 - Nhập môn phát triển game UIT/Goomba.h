@@ -2,7 +2,7 @@
 #include "GameObject.h"
 
 #define GOOMBA_GRAVITY 0.002f
-#define GOOMBA_WALKING_SPEED 0.05f
+#define GOOMBA_WALKING_SPEED 0.03f
 #define GOOMBA_HIT_DEFLECT_SPEED 0.4f
 
 
@@ -23,17 +23,21 @@
 class CGoomba : public CGameObject
 {
 protected:
-	float ax;				
+	float ax;
 	float ay; 
 
 	int hit_nx;
 	ULONGLONG die_start;
 
+	BOOLEAN isFellDown;
+
+	int trigger;
+
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects);
 	virtual void Render();
 
-	virtual int IsCollidable() { return (state != GOOMBA_STATE_HIT); }
+	
 	virtual int IsBlocking() { return 0; }
 	virtual void OnNoCollision(DWORD dt);
 
@@ -43,5 +47,9 @@ protected:
 public: 	
 	CGoomba(float x, float y);
 	virtual void SetState(int state);
+	virtual int IsCollidable()
+	{
+		return (state != GOOMBA_STATE_HIT) && isActived;
+	}
 
 };

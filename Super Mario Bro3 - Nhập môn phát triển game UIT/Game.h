@@ -108,6 +108,12 @@ public:
 
 	void SetCamPos(float x, float y) { cam_x = x; cam_y = y; }
 	void GetCamPos(float& x, float& y) { x = cam_x; y = cam_y; }
+	BOOLEAN IsCamEnter(float x, float y) {
+		return ((cam_x + screen_width >= x) && (cam_x <= x))
+			&& ((cam_y <= y) && (cam_y + screen_height >= y));
+	}
+	BOOLEAN IsRightSideOfCam(float x) { return (cam_x + screen_width < x); }
+	BOOLEAN IsLeftSideOfCam(float x) { return (cam_x > x); }
 
 	void GetScreenSize(float& w, float& h) { w = screen_width; h = screen_height; }
 
