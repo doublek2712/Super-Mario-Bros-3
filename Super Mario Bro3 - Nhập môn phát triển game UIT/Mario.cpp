@@ -150,9 +150,9 @@ void CMario::OnCollisionWithKoopa(LPCOLLISIONEVENT e)
 	}
 	else 
 	{
-		if (untouchable == 0)
+		if (untouchable == 0 && koopa->IsCollidable())
 		{
-			if (koopa->GetState() != KOOPA_STATE_SHELL_IDLE)
+			if (koopa->GetState() != KOOPA_STATE_SHELL_IDLE )
 			{
 				if (isTailAttacking)
 				{

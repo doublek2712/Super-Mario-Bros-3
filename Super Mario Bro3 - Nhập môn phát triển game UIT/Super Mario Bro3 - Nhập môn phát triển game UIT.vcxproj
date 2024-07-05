@@ -167,6 +167,7 @@
     <ClInclude Include="ParaKoopa.h" />
     <ClInclude Include="Pipe.h" />
     <ClInclude Include="Platform.h" />
+    <ClInclude Include="PlatformChecker.h" />
     <ClInclude Include="PlayScene.h" />
     <ClInclude Include="SampleKeyEventHandler.h" />
     <ClInclude Include="Scene.h" />

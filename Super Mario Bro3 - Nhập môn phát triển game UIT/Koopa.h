@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObject.h"
+#include "PlatformChecker.h"
 
 #define KOOPA_GRAVITY 0.0004f
 #define KOOPA_WALKING_SPEED 0.03f
@@ -46,21 +47,19 @@ protected:
 	BOOLEAN isBlockByPlatform;
 	BOOLEAN isOnPlatform;
 
-	float l_bounded, r_bounded;
-	BOOLEAN isOnBlock;
-
 	BOOLEAN isHeld;
 
 	BOOLEAN isKicked;
 
 	int trigger;
 
+	CPlatformChecker* platformChecker;
+
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	virtual void Render();
 
-	virtual int IsCollidable() { return 1; };
-	virtual int IsBlocking() { return 0; }
+
 	virtual void OnNoCollision(DWORD dt);
 
 	virtual void OnCollisionWith(LPCOLLISIONEVENT e);
@@ -76,4 +75,6 @@ public:
 	void GetHit(int nx);
 	void HoldByMario(float* x, float* y, int* nx);
 	void UpdatePositionFollowMario();
+	virtual int IsCollidable() { return isActived; };
+	virtual int IsBlocking() { return 0; }
 };

@@ -14,12 +14,18 @@ CKoopa::CKoopa(float x, float y, BOOLEAN block) :CGameObject(x, y)
 	this->ax = 0;
 	this->isBlockByPlatform = block;
 	this->ay = KOOPA_GRAVITY;
-	this->isOnBlock = FALSE;
 	this->nx = -1;
 	this->m_x = nullptr;
 	this->m_y = nullptr;
 	this->isHeld = FALSE;
 	this->isKicked = FALSE;
+
+	if (block)
+	{
+		platformChecker = new CPlatformChecker(x + nx * (KOOPA_BBOX_WIDTH), y, KOOPA_BBOX_HEIGHT, KOOPA_BBOX_WIDTH);
+	}
+	else platformChecker = nullptr;
+
 	SetState(KOOPA_STATE_WALKING);
 }
 
@@ -60,9 +66,8 @@ void CKoopa::OnCollisionWith(LPCOLLISIONEVENT e)
 		vx = -vx;
 		nx = -nx;
 	}
-	if (dynamic_cast<CPlatform*>(e->obj) || dynamic_cast<CGround*>(e->obj))
-		OnCollisionWithPlatform(e);
-	else if (dynamic_cast<CBlock*>(e->obj))
+	
+	if (dynamic_cast<CBlock*>(e->obj))
 		OnCollisionWithBlock(e);
 		
 	
@@ -92,43 +97,11 @@ void CKoopa::OnCollisionWithOtherUnit(LPCOLLISIONEVENT e)
 
 void CKoopa::OnCollisionWithPlatform(LPCOLLISIONEVENT e)
 {
-	if (e->ny < 0)
-	{
-		isOnBlock = FALSE;
-		CGameObject* platform = e->obj;
-
-		float l, r, t, b;
-		platform->GetBoundingBox(l, t, r, b);
-
-		l_bounded = l;
-		r_bounded = r;
-	}
 	
 }
 void CKoopa::OnCollisionWithBlock(LPCOLLISIONEVENT e)
 {
-	
-	if (e->ny < 0)
-	{
-		
-
-		float l, r, t, b;
-		e->obj->GetBoundingBox(l, t, r, b);
-		//DebugOut(L"%f\n", r);
-		if (!isOnBlock)
-		{
-			l_bounded = l;
-			r_bounded = r;
-			isOnBlock = TRUE;
-		}
-		else
-		{
-			l_bounded = min(l, l_bounded);
-			r_bounded = max(r, r_bounded);
-
-		}
-	}
-	else if (e->nx != 0)
+	if (e->nx != 0)
 	{
 		if (dynamic_cast<CWood*>(e->obj))
 			return;
@@ -188,11 +161,7 @@ void CKoopa::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 	if (isBlockByPlatform && state == KOOPA_STATE_WALKING)
 	{
-		if ((x <= l_bounded && vx < 0) || (x >= r_bounded && vx > 0))
-		{
-			vx = -vx;
-			nx = -nx;
-		}
+
 	}
 
 	if (state == KOOPA_STATE_SHELL_IDLE_HIT)
@@ -201,10 +170,26 @@ void CKoopa::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			SetState(KOOPA_STATE_SHELL_IDLE);
 	}
 
+	//
+	if (platformChecker != nullptr)
+	{
+		platformChecker->Update(dt, coObjects);
+		if (platformChecker->IsFallOffPlatform() && isBlockByPlatform && state == KOOPA_STATE_WALKING && isOnPlatform)
+		{
+			vx = -vx;
+			nx = -nx;
+
+			platformChecker->SetVx(vx);
+			platformChecker->SetPosition(x + nx * (KOOPA_BBOX_WIDTH), y);
+		}
+
+	}
+	
+
 	isOnPlatform = false;
 
 	if(!isHeld)
-		CCollision::GetInstance()->Process(this, dt, coObjects, 1);
+		CCollision::GetInstance()->Process(this, dt, coObjects);
 	else {
 		
 	}
@@ -242,6 +227,8 @@ void CKoopa::Render()
 	
 
 	CAnimations::GetInstance()->Get(aniId)->Render(x, y);
+
+
 	//RenderBoundingBox();
 }
 
@@ -252,6 +239,10 @@ void CKoopa::SetState(int state)
 	{
 	case KOOPA_STATE_WALKING:
 		vx = nx * KOOPA_WALKING_SPEED;
+		if (platformChecker != nullptr)
+		{
+			platformChecker->SetVx(vx);
+		}
 		isKicked = FALSE;
 		break;
 	case KOOPA_STATE_SHELL_IDLE:
