@@ -15,6 +15,8 @@
 #include "Koopa.h"
 #include "ParaGoomba.h"
 #include "ParaKoopa.h"
+#include "Brick.h"
+#include "PButton.h"
 
 #include "Collision.h"
 
@@ -103,6 +105,8 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithCoin(e);
 	else if (dynamic_cast<CPortal*>(e->obj))
 		OnCollisionWithPortal(e);
+	else if (dynamic_cast<CBrick*>(e->obj))
+		OnCollisionWithBrick(e);
 	else if (dynamic_cast<CBlock*>(e->obj))
 		OnCollisionWithQBlock(e);
 	else if (dynamic_cast<CSuperMushroom*>(e->obj))
@@ -115,8 +119,27 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithPiranha(e);
 	else if (dynamic_cast<CKoopa*>(e->obj))
 		OnCollisionWithKoopa(e);
+	else if (dynamic_cast<CPButton*>(e->obj))
+		OnCollisionWithPButton(e);
 }
-
+void CMario::OnCollisionWithBrick(LPCOLLISIONEVENT e)
+{
+	CBrick* brick = dynamic_cast<CBrick*>(e->obj);
+	if (e->ny > 0 || (e->nx != 0 && isTailAttacking))
+	{
+		if (brick->GetState() == BRICK_STATE_IDLE)
+			brick->SetState(BRICK_STATE_HIT);
+	}
+}
+void CMario::OnCollisionWithPButton(LPCOLLISIONEVENT e)
+{
+	CPButton* button = dynamic_cast<CPButton*>(e->obj);
+	if (e->ny < 0)
+	{
+		if (button->GetState() == PBUTTON_STATE_IDLE)
+			button->SetState(PBUTTON_STATE_PRESSED);
+	}
+}
 void CMario::OnCollisionWithKoopa(LPCOLLISIONEVENT e)
 {
 	CKoopa* koopa = dynamic_cast<CKoopa*>(e->obj);

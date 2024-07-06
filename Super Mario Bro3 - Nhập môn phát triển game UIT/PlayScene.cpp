@@ -23,6 +23,8 @@
 #include "Koopa.h"
 #include "ParaGoomba.h"
 #include "ParaKoopa.h"
+#include "Brick.h"
+#include "PButton.h"
 
 #include "SampleKeyEventHandler.h"
 
@@ -256,6 +258,25 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	{
 		gridToreal(x, y);
 		obj = new CWood(x, y);
+		break;
+	}
+	case OBJECT_TYPE_BRICK:
+	{
+		gridToreal(x, y);
+		int type = atoi(tokens[3].c_str());
+		
+
+		if (type == BRICK_TYPE_BUTTON)
+		{
+			CPButton* pbutton = new CPButton(x, y - GRID_SIZE);
+			objects.push_back(pbutton);
+			obj = new CBrick(x, y, pbutton);
+
+			pbutton = NULL;
+			delete pbutton;
+		}
+		else
+			obj = new CBrick(x, y);
 		break;
 	}
 	case OBJECT_TYPE_VENUS:

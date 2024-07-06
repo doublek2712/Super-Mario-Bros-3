@@ -9,6 +9,7 @@
 #include "Wood.h"
 #include "PlayScene.h"
 #include "ParaKoopa.h"
+#include "Brick.h"
 
 int RelativedPositionOfPlatformChecker(int x, int nx) {
 	return x + nx * (KOOPA_BBOX_WIDTH - 4);
@@ -110,7 +111,12 @@ void CKoopa::OnCollisionWithBlock(LPCOLLISIONEVENT e)
 	{
 		if (dynamic_cast<CWood*>(e->obj))
 			return;
-
+		if (dynamic_cast<CBrick*>(e->obj))
+		{
+			CBrick* brick = dynamic_cast<CBrick*>(e->obj);
+			if (brick->GetState() == BRICK_STATE_IDLE && isKicked)
+					brick->SetState(BRICK_STATE_HIT);
+		}
 		CBlock* block = dynamic_cast<CBlock*>(e->obj);
 		if(isKicked)
 			block->SetState(BLOCK_STATE_COLLIDED_SIDE);

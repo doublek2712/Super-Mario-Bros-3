@@ -40,7 +40,9 @@ public:
 		this->contain_type = contain_type;
 		this->item = item;
 	}
-	CBlock(float x, float y) : CGameObject(x, y){}
+	CBlock(float x, float y) : CGameObject(x, y){
+		this->item = nullptr;
+	}
 
 	void Render();
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);

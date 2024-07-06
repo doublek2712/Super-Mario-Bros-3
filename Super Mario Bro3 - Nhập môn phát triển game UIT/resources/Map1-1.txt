@@ -12,6 +12,7 @@ resources\pipe.txt
 resources\piranha.txt
 resources\bullet.txt
 resources\koopa.txt
+resources\button.txt
 #
 #because the program will render object in the order of loading this file, so first in last stand !!
 [BOUNDARIES]
@@ -53,6 +54,7 @@ resources\koopa.txt
 #KOOPA
 3	592	120	1
 3	1456	150	0
+3	2096	120	1
 
 #PARAKOOPA
 11	1344	60	0
@@ -94,6 +96,28 @@ resources\koopa.txt
 1	44	7	0
 1	92	7	2
 1	90	-7	0
+
+#BRICK
+12	122	10	1
+12	123	10	1
+12	123	9	1
+12	124	10	1
+12	124	9	1
+12	124	8	1
+12	125	10	1
+12	125	9	1
+12	125	8	1
+12	126	10	1
+12	126	9	1
+12	126	8	1
+12	127	10	1
+12	127	9	1
+12	127	8	2
+12	128	10	1
+
+12	131	10	1
+12	131	9	1
+12	132	10	1
 
 #Ground
 #x, y below represent for grid cell
@@ -148,7 +172,7 @@ resources\koopa.txt
 
 
 # MARIO
-0	500	160
+0	2000	100
 
 [BACKGROUND]
 #x, y below represent for grid cell

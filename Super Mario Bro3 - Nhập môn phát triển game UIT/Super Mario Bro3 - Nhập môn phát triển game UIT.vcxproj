@@ -150,6 +150,7 @@
     <ClInclude Include="BackgroundElement.h" />
     <ClInclude Include="Block.h" />
     <ClInclude Include="BouncingCoin.h" />
+    <ClInclude Include="Brick.h" />
     <ClInclude Include="Coin.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="Configs.h" />
@@ -165,6 +166,7 @@
     <ClInclude Include="Mario.h" />
     <ClInclude Include="ParaGoomba.h" />
     <ClInclude Include="ParaKoopa.h" />
+    <ClInclude Include="PButton.h" />
     <ClInclude Include="Pipe.h" />
     <ClInclude Include="Platform.h" />
     <ClInclude Include="PlatformChecker.h" />
@@ -199,6 +201,7 @@
     <ClCompile Include="Mario.cpp" />
     <ClCompile Include="ParaGoomba.cpp" />
     <ClCompile Include="ParaKoopa.cpp" />
+    <ClCompile Include="PButton.cpp" />
     <ClCompile Include="Pipe.cpp" />
     <ClCompile Include="Platform.cpp" />
     <ClCompile Include="PlayScene.cpp" />
