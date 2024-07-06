@@ -9,6 +9,11 @@
 #include "Wood.h"
 #include "PlayScene.h"
 #include "ParaKoopa.h"
+
+int RelativedPositionOfPlatformChecker(int x, int nx) {
+	return x + nx * (KOOPA_BBOX_WIDTH - 4);
+}
+
 CKoopa::CKoopa(float x, float y, BOOLEAN block) :CGameObject(x, y)
 {
 	this->ax = 0;
@@ -22,7 +27,7 @@ CKoopa::CKoopa(float x, float y, BOOLEAN block) :CGameObject(x, y)
 
 	if (block)
 	{
-		platformChecker = new CPlatformChecker(x + nx * (KOOPA_BBOX_WIDTH), y, KOOPA_BBOX_HEIGHT, KOOPA_BBOX_WIDTH);
+		platformChecker = new CPlatformChecker(RelativedPositionOfPlatformChecker(x, nx), y, KOOPA_BBOX_HEIGHT, KOOPA_BBOX_WIDTH);
 	}
 	else platformChecker = nullptr;
 
@@ -180,7 +185,7 @@ void CKoopa::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			nx = -nx;
 
 			platformChecker->SetVx(vx);
-			platformChecker->SetPosition(x + nx * (KOOPA_BBOX_WIDTH), y);
+			platformChecker->SetPosition(RelativedPositionOfPlatformChecker(x, nx), y);
 		}
 
 	}

@@ -3,7 +3,7 @@
 #include "PlatformChecker.h"
 
 #define KOOPA_GRAVITY 0.0004f
-#define KOOPA_WALKING_SPEED 0.03f
+#define KOOPA_WALKING_SPEED 0.02f
 #define KOOPA_SHELL_MOVE 0.24f
 #define KOOMBA_HIT_DEFLECT_SPEED 0.2f
 
