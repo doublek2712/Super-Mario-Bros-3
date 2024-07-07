@@ -1,0 +1,11 @@
+# id	left	top	right	bottom	texture_id
+[SPRITES]
+## MARIO TURN TO RACCOON
+120001	1	14	16	29	60
+120002	18	14	33	29	60
+120003	35	14	50	29	60
+120004	52	14	67	29	60
+
+# ani_id	sprite1_id	time1	sprite2_id	time2	...
+[ANIMATIONS]
+13000	120001	250	120002	250	120003	250	120004	250

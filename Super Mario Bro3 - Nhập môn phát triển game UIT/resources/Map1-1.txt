@@ -13,6 +13,7 @@ resources\piranha.txt
 resources\bullet.txt
 resources\koopa.txt
 resources\button.txt
+resources\VFX.txt
 #
 #because the program will render object in the order of loading this file, so first in last stand !!
 [BOUNDARIES]

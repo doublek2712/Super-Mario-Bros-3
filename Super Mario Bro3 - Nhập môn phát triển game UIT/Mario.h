@@ -89,6 +89,9 @@
 #define ID_ANI_MARIO_HOLD_RIGHT_WALKING 1026
 #define ID_ANI_MARIO_HOLD_RIGHT_JUMP 1031
 
+#define	ID_ANI_MARIO_TURN_INTO_SMALL_LEFT	1040
+#define	ID_ANI_MARIO_TURN_INTO_SMALL_RIGHT	1041
+
 #define ID_ANI_MARIO_DIE 999
 
 // SMALL MARIO
@@ -120,6 +123,9 @@
 #define ID_ANI_MARIO_SMALL_HOLD_RIGHT_IDLE 1625
 #define ID_ANI_MARIO_SMALL_HOLD_RIGHT_WALKING 1626
 #define ID_ANI_MARIO_SMALL_HOLD_RIGHT_JUMP 1631
+
+#define	ID_ANI_MARIO_SMALL_TURN_INTO_BIG_LEFT	1640
+#define	ID_ANI_MARIO_SMALL_TURN_INTO_BIG_RIGHT	1641
 
 // RACCOON MARIO
 #define ID_ANI_MARIO_RACCOON_IDLE_RIGHT 1700
@@ -163,6 +169,9 @@
 #define ID_ANI_MARIO_RACCOON_TAIL_ATTACK_LEFT 2401
 #define ID_ANI_MARIO_RACCOON_TAIL_ATTACK_RIGHT 2402
 
+#define ID_ANI_MARIO_TURN_INTO_RACCOON	13000
+#define ID_ANI_MARIO_RACCOON_TURN_INTO_BIG	13000
+
 #pragma endregion
 
 #define GROUND_Y 160.0f
@@ -186,6 +195,7 @@
 #define MARIO_UNTOUCHABLE_TIME	3000
 #define MARIO_KICK_ANI_TIME		300
 #define MARIO_TAIL_ATTACK_TIME	400
+#define MARIO_TRANSFORM_TIME	1000
 
 class CMario : public CGameObject
 {
@@ -195,10 +205,12 @@ class CMario : public CGameObject
 	float ay;				// acceleration on y 
 
 	int level;
+	int previous_level;
 	int untouchable;
 	ULONGLONG untouchable_start;
 	ULONGLONG kick_start;
 	ULONGLONG tail_attack_start;
+	ULONGLONG transform_start;
 
 	BOOLEAN isOnPlatform;
 	int coin;
@@ -213,6 +225,7 @@ class CMario : public CGameObject
 	BOOLEAN isFlying;
 	BOOLEAN isWagging;
 	BOOLEAN isTailAttacking;
+	BOOLEAN isTransform;
 
 	void OnCollisionWithFire(LPCOLLISIONEVENT e);
 	void OnCollisionWithSuperLeaf(LPCOLLISIONEVENT e);
@@ -240,10 +253,12 @@ public:
 		ay = MARIO_GRAVITY;
 
 		level = MARIO_LEVEL_SMALL;
+		previous_level = level;
 		untouchable = 0;
 		untouchable_start = -1;
 		kick_start = -1;
 		tail_attack_start = -1;
+		transform_start = -1;
 		isOnPlatform = false;
 		coin = 0;
 		isKicking = FALSE;
@@ -253,6 +268,7 @@ public:
 		isFlying = FALSE;
 		isWagging = FALSE;
 		isTailAttacking = FALSE;
+		isTransform = FALSE;
 	}
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	void Render();

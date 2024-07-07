@@ -22,6 +22,8 @@
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+
+
 	if (isOnPlatform)
 	{
 		ay = MARIO_GRAVITY;
@@ -52,22 +54,28 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 
 	// reset untouchable timer if untouchable time has passed
-	if (GetTickCount64() - untouchable_start > MARIO_UNTOUCHABLE_TIME)
+	if (untouchable && GetTickCount64() - untouchable_start > MARIO_UNTOUCHABLE_TIME)
 	{
 		untouchable_start = 0;
 		untouchable = 0;
 	}
 	// reset kick timer 
-	if (GetTickCount64() - kick_start > MARIO_KICK_ANI_TIME)
+	if (isKicking && GetTickCount64() - kick_start > MARIO_KICK_ANI_TIME)
 	{
 		kick_start = 0;
 		isKicking = FALSE;
 	}
 	// reset tail attack timer
-	if (GetTickCount64() - tail_attack_start > MARIO_TAIL_ATTACK_TIME)
+	if (isTailAttacking && GetTickCount64() - tail_attack_start > MARIO_TAIL_ATTACK_TIME)
 	{
 		tail_attack_start = 0;
 		isTailAttacking = FALSE;
+	}
+
+	// reset transform timer
+	if (isTransform && GetTickCount64() - transform_start > MARIO_TRANSFORM_TIME) {
+		transform_start = 0;
+		isTransform = FALSE;
 	}
 
 	isOnPlatform = false;
@@ -305,13 +313,13 @@ void CMario::HitByEnemy()
 	{
 		if (level == MARIO_LEVEL_RACCOON)
 		{
-			level = MARIO_LEVEL_BIG;
+			SetLevel(MARIO_LEVEL_BIG);
 			StartUntouchable();
 		}
 		else
-			if (level > MARIO_LEVEL_SMALL)
+			if (level == MARIO_LEVEL_BIG)
 			{
-				level = MARIO_LEVEL_SMALL;
+				SetLevel(MARIO_LEVEL_SMALL);
 				StartUntouchable();
 			}
 			else
@@ -327,6 +335,11 @@ void CMario::HitByEnemy()
 int CMario::GetAniIdSmall()
 {
 	int aniId = -1;
+	if (isTransform)
+	{
+		aniId = (nx < 0) ? ID_ANI_MARIO_TURN_INTO_SMALL_LEFT : ID_ANI_MARIO_TURN_INTO_SMALL_RIGHT;
+	}
+	else
 	if (!isOnPlatform)
 	{
 		if (isHolding)
@@ -424,6 +437,16 @@ int CMario::GetAniIdSmall()
 int CMario::GetAniIdBig()
 {
 	int aniId = -1;
+
+
+	if (isTransform)
+	{
+		if (previous_level > level)
+			aniId = ID_ANI_MARIO_TURN_INTO_RACCOON;
+		else
+			aniId = (nx < 0) ? ID_ANI_MARIO_SMALL_TURN_INTO_BIG_LEFT : ID_ANI_MARIO_SMALL_TURN_INTO_BIG_RIGHT;
+	}
+	else
 	if (!isOnPlatform)
 	{
 		if (isHolding)
@@ -520,6 +543,10 @@ int CMario::GetAniIdBig()
 int CMario::GetAniIdRaccoon()
 {
 	int aniId = -1;
+
+	if (isTransform)
+		aniId = ID_ANI_MARIO_TURN_INTO_RACCOON;
+	else
 	if (isTailAttacking)
 	{
 		aniId = (nx > 0) ? ID_ANI_MARIO_RACCOON_TAIL_ATTACK_RIGHT : ID_ANI_MARIO_RACCOON_TAIL_ATTACK_LEFT;
@@ -849,6 +876,15 @@ void CMario::SetLevel(int l)
 	{
 		y -= (MARIO_BIG_BBOX_HEIGHT - MARIO_SMALL_BBOX_HEIGHT) / 2;
 	}
+
+	//
+	if (this->level != l)
+	{
+		isTransform = TRUE;
+		transform_start = GetTickCount64();
+	}
+
+	previous_level = this->level;
 	level = l;
 }
 
