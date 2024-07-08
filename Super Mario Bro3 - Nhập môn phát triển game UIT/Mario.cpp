@@ -17,12 +17,12 @@
 #include "ParaKoopa.h"
 #include "Brick.h"
 #include "PButton.h"
+#include "Pipe.h"
 
 #include "Collision.h"
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-
 
 	if (isOnPlatform)
 	{
@@ -32,7 +32,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	else
 		ay = MARIO_ON_AIR_DECLERATION;
 
-	vy += ay * dt;
+	if(!isPipe)
+		vy += ay * dt;
 	vx += ax * dt;
 
 	// deceleration to prevent slipping
@@ -78,7 +79,20 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		isTransform = FALSE;
 	}
 
+	// reset pipe timer
+	if (isPipe && GetTickCount64() - pipe_start > MARIO_PIPE_TIME) {
+		if (state == MARIO_STATE_PIPE_ENTRANCE)
+			SetState(MARIO_STATE_PIPE_EXIT);
+		else
+		{
+			pipe_start = 0;
+			isPipe = FALSE;
+		}
+
+	}
+
 	isOnPlatform = false;
+	readyToPipe = FALSE;
 
 	CCollision::GetInstance()->Process(this, dt, coObjects);
 
@@ -129,6 +143,34 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithKoopa(e);
 	else if (dynamic_cast<CPButton*>(e->obj))
 		OnCollisionWithPButton(e);
+	else if (dynamic_cast<CPipe*>(e->obj))
+		OnCollisionWithPipe(e);
+}
+
+void CMario::OnCollisionWithPipe(LPCOLLISIONEVENT e)
+{
+	CPipe* pipe = dynamic_cast<CPipe*>(e->obj);
+	if ((pipe->GetMap() == MAP_MAIN && e->ny < 0) ||
+		(pipe->GetMap() > MAP_MAIN && e->ny > 0))
+	{
+		if (pipe->GetType() == GATE_TYPE_ENTRANCE)
+		{
+			readyToPipe = TRUE;
+			pipeDestination = pipe->GetIndex();
+
+			float des_y;
+			pipe->GetPosition(pipeDestination_x, des_y);
+
+			if (pipe->GetMap() > MAP_MAIN)
+				pipeDestination_ny = -1;
+			else
+				pipeDestination_ny = 1;
+
+			CPipe* exit_pipe = dynamic_cast<CPlayScene*>(CGame::GetInstance()->GetCurrentScene())->GetExitPipeWithIndex(pipeDestination);
+			mapIndex = exit_pipe->GetMap();
+		}
+	}
+
 }
 void CMario::OnCollisionWithBrick(LPCOLLISIONEVENT e)
 {
@@ -216,6 +258,7 @@ void CMario::OnCollisionWithKoopa(LPCOLLISIONEVENT e)
 	}
 }
 
+
 void CMario::OnCollisionWithFire(LPCOLLISIONEVENT e) {
 
 	HitByEnemy();
@@ -299,7 +342,6 @@ void CMario::OnCollisionWithCoin(LPCOLLISIONEVENT e)
 {
 	if (!e->obj->IsCollidable()) return;
 	e->obj->Delete();
-	coin++;
 }
 
 void CMario::OnCollisionWithPortal(LPCOLLISIONEVENT e)
@@ -335,6 +377,12 @@ void CMario::HitByEnemy()
 int CMario::GetAniIdSmall()
 {
 	int aniId = -1;
+
+	if (isPipe)
+	{
+		aniId = ID_ANI_MARIO_SMALL_PIPE;
+	}
+	else
 	if (isTransform)
 	{
 		aniId = (nx < 0) ? ID_ANI_MARIO_TURN_INTO_SMALL_LEFT : ID_ANI_MARIO_TURN_INTO_SMALL_RIGHT;
@@ -438,7 +486,11 @@ int CMario::GetAniIdBig()
 {
 	int aniId = -1;
 
-
+	if (isPipe)
+	{
+		aniId = ID_ANI_MARIO_PIPE;
+	}
+	else
 	if (isTransform)
 	{
 		if (previous_level > level)
@@ -544,6 +596,11 @@ int CMario::GetAniIdRaccoon()
 {
 	int aniId = -1;
 
+	if (isPipe)
+	{
+		aniId = ID_ANI_MARIO_RACCOON_PIPE;
+	}
+	else
 	if (isTransform)
 		aniId = ID_ANI_MARIO_TURN_INTO_RACCOON;
 	else
@@ -682,6 +739,7 @@ void CMario::SetState(int state)
 {
 	// DIE is the end state, cannot be changed! 
 	if (this->state == MARIO_STATE_DIE) return;
+	if (isPipe && state != MARIO_STATE_PIPE_EXIT) return;
 
 	switch (state)
 	{
@@ -752,8 +810,20 @@ void CMario::SetState(int state)
 		isFlying = FALSE;
 		isWagging = FALSE;
 		break;
-
+	case MARIO_STATE_UP:
+		if (readyToPipe)
+		{
+			SetState(MARIO_STATE_PIPE_ENTRANCE);
+			return;
+		}
+		return;
+		break;
 	case MARIO_STATE_SIT:
+		if (readyToPipe)
+		{
+			SetState(MARIO_STATE_PIPE_ENTRANCE);
+			return;
+		}
 		if (vx != 0) return;
 		if (isOnPlatform && level != MARIO_LEVEL_SMALL)
 		{
@@ -834,7 +904,34 @@ void CMario::SetState(int state)
 		vx = 0;
 		ax = 0;
 		break;
+
+	case MARIO_STATE_PIPE_ENTRANCE:
+		readyToPipe = FALSE;
+		isPipe = TRUE;
+		pipe_start = GetTickCount64();
+		vy = pipeDestination_ny * MARIO_PIPE_SPEED;
+		x = pipeDestination_x + GRID_SIZE / 2;
+		break;
+
+	case MARIO_STATE_PIPE_EXIT:
+		isPipe = TRUE;
+		pipe_start = GetTickCount64();
+
+		float exit_x, exit_y;
+
+		CPipe* exit_pipe = dynamic_cast<CPlayScene*>(CGame::GetInstance()->GetCurrentScene())->GetExitPipeWithIndex(pipeDestination);
+		exit_pipe->GetPosition(exit_x, exit_y);
+
+		x = exit_x + GRID_SIZE / 2;
+
+		if (exit_pipe->GetMap() == MAP_MAIN)
+			y = exit_y;
+		else
+			y = exit_y;
+		vy = pipeDestination_ny * MARIO_PIPE_SPEED;
+		break;
 	}
+	
 
 	CGameObject::SetState(state);
 }

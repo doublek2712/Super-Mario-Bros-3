@@ -47,6 +47,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 #define SCENE_SECTION_OBJECTS	2
 #define SCENE_SECTION_BACKGROUND	3
 #define SCENE_SECTION_BOUNDARIES	4
+#define SCENE_SECTION_HIDDENMAPS	5
 
 #define ASSETS_SECTION_UNKNOWN -1
 #define ASSETS_SECTION_SPRITES 1
@@ -111,12 +112,27 @@ void CPlayScene::_ParseSection_BOUNDARIES(string line)
 
 	if (tokens.size() < 4) return; // skip invalid lines
 
-	b_left = atoi(tokens[0].c_str());
-	b_top = atoi(tokens[1].c_str());
-	b_right = atoi(tokens[2].c_str());
-	b_bottom = atoi(tokens[3].c_str());
+	mainBoundary.left = atoi(tokens[0].c_str());
+	mainBoundary.top = atoi(tokens[1].c_str());
+	mainBoundary.right = atoi(tokens[2].c_str());
+	mainBoundary.bottom = atoi(tokens[3].c_str());
 
+	currentBoundary = mainBoundary;
+}
 
+void CPlayScene::_ParseSection_HIDDENMAPS(string line)
+{
+	vector<string> tokens = split(line);
+
+	if (tokens.size() < 5) return; // skip invalid lines
+
+	Boundary hidden;
+	hidden.left = atoi(tokens[1].c_str());
+	hidden.top = atoi(tokens[2].c_str());
+	hidden.right = atoi(tokens[3].c_str());
+	hidden.bottom = atoi(tokens[4].c_str());
+
+	hiddenMapBoundary.push_back(hidden);
 }
 
 void CPlayScene::_ParseSection_ANIMATIONS(string line)
@@ -239,10 +255,39 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	{
 		gridToreal(x, y);
 		int dir = atoi(tokens[3].c_str());
-		int flip = atoi(tokens[4].c_str());
-		int length = atoi(tokens[5].c_str());
+		int length = atoi(tokens[4].c_str());
+		int map = atoi(tokens[5].c_str());
+		int gateType = atoi(tokens[6].c_str());
 
-		obj = new CPipe(x, y, dir, flip, length);
+		if (gateType != GATE_TYPE_NONE)
+		{
+			int index = atoi(tokens[7].c_str());
+			obj = new CPipe(x, y, dir, length, map, gateType, index);
+
+			//add pipe to array - helpful for process pipe's logic
+			if (pipes.size() >= (index + 1)) 
+			{
+				if (gateType == GATE_TYPE_ENTRANCE)
+					pipes[index].entrance = dynamic_cast<CPipe*>(obj);
+				else 
+					pipes[index].exit = dynamic_cast<CPipe*>(obj);
+			}
+			else
+			{
+				PipePair newPipePair;
+				if (gateType == GATE_TYPE_ENTRANCE)
+					newPipePair.entrance = dynamic_cast<CPipe*>(obj);
+				else
+					newPipePair.exit = dynamic_cast<CPipe*>(obj);
+
+				pipes.push_back(newPipePair);
+			}
+		}
+		else 
+			obj = new CPipe(x, y, dir, length, map, gateType);
+
+		
+
 		break;
 	}
 
@@ -375,6 +420,7 @@ void CPlayScene::Load()
 		if (line == "[OBJECTS]") { section = SCENE_SECTION_OBJECTS; continue; }; 
 		if (line == "[BACKGROUND]") { section = SCENE_SECTION_BACKGROUND; continue; };
 		if (line == "[BOUNDARIES]") { section = SCENE_SECTION_BOUNDARIES; continue; };
+		if (line == "[HIDDENMAPS]") { section = SCENE_SECTION_HIDDENMAPS; continue; };
 		if (line[0] == '[') { section = SCENE_SECTION_UNKNOWN; continue; }
 
 		//
@@ -386,6 +432,7 @@ void CPlayScene::Load()
 		case SCENE_SECTION_OBJECTS: _ParseSection_OBJECTS(line); break;
 		case SCENE_SECTION_BACKGROUND: _ParseSection_BACKGROUND(line); break;
 		case SCENE_SECTION_BOUNDARIES: _ParseSection_BOUNDARIES(line); break;
+		case SCENE_SECTION_HIDDENMAPS: _ParseSection_HIDDENMAPS(line); break;
 		}
 	}
 
@@ -414,56 +461,79 @@ void CPlayScene::Update(DWORD dt)
 	float cx, cy;
 	player->GetPosition(cx, cy);
 
-	if (cx <= b_left*GRID_SIZE) {
-		player->SetPosition(b_left * GRID_SIZE, cy);
+	if (cx <= currentBoundary.left*GRID_SIZE) {
+		player->SetPosition(currentBoundary.left * GRID_SIZE, cy);
 		player->SetState(MARIO_STATE_IDLE);
 	}
-	if (cx >= b_right * GRID_SIZE) {
-		player->SetPosition(b_right * GRID_SIZE, cy);
+	if (cx >= currentBoundary.right * GRID_SIZE) {
+		player->SetPosition(currentBoundary.right * GRID_SIZE, cy);
 		player->SetState(MARIO_STATE_IDLE);
 	}
 
-	CGame* game = CGame::GetInstance();	
+	
+	AdjustCamPos();
+	PurgeDeletedObjects();
+
+	CMario* mario = dynamic_cast<CMario*>(player);
+	if (mario->IsPipe())
+	{
+		if(mario->GetMap() > MAP_MAIN)
+			currentBoundary = hiddenMapBoundary[mario->GetMap()];
+		else
+			currentBoundary = mainBoundary;
+	}
+
+}
+
+void CPlayScene::AdjustCamPos()
+{
+
+	CMario* mario = dynamic_cast<CMario*>(player);
+
+	if (mario->GetState() == MARIO_STATE_PIPE_ENTRANCE)
+		return;
+
+	float cx, cy;
+	mario->GetPosition(cx, cy);
+
+	CGame* game = CGame::GetInstance();
 	cx -= game->GetBackBufferWidth() / 2;
 	cy -= game->GetBackBufferHeight() / 2;
 	float s_width, s_height;
 	game->GetScreenSize(s_width, s_height);
 
-	if (cx < b_left * GRID_SIZE) cx = b_left * GRID_SIZE;
-	if (cx > b_right * GRID_SIZE + GRID_SIZE - s_width)
-		cx = b_right * GRID_SIZE + GRID_SIZE - s_width;
+	if (cx < currentBoundary.left * GRID_SIZE) cx = currentBoundary.left * GRID_SIZE;
+	if (cx > currentBoundary.right * GRID_SIZE + GRID_SIZE - s_width)
+		cx = currentBoundary.right * GRID_SIZE + GRID_SIZE - s_width;
 
-	if (cy < b_top * GRID_SIZE)
-		cy = b_top * GRID_SIZE;
+	if (cy < currentBoundary.top * GRID_SIZE)
+		cy = currentBoundary.top * GRID_SIZE;
 
-	CMario* mario = dynamic_cast<CMario*>(player);
 	if (!mario->IsFlying())
 	{
 		if (!isCamYPosAdjust)
 		{
-			if (cy > b_bottom * GRID_SIZE - s_height - s_height / 2 - GRID_SIZE * 2)
-				cy = b_bottom * GRID_SIZE - s_height;
+			if (cy > currentBoundary.bottom * GRID_SIZE - s_height - s_height / 2 - GRID_SIZE * 2)
+				cy = currentBoundary.bottom * GRID_SIZE - s_height;
 		}
 		else
 		{
-			if (cy > b_bottom * GRID_SIZE - s_height)
+			if (cy > currentBoundary.bottom * GRID_SIZE - s_height)
 			{
-				cy = b_bottom * GRID_SIZE - s_height;
+				cy = currentBoundary.bottom * GRID_SIZE - s_height;
 				isCamYPosAdjust = FALSE;
 			}
 		}
 	}
-	else 
+	else
 	{
-		if (cy > b_bottom * GRID_SIZE - s_height)
-			cy = b_bottom * GRID_SIZE - s_height;
+		if (cy > currentBoundary.bottom * GRID_SIZE - s_height)
+			cy = currentBoundary.bottom * GRID_SIZE - s_height;
 		else {
 			isCamYPosAdjust = TRUE;
 		}
 	}
 	CGame::GetInstance()->SetCamPos(cx, cy);
-
-	PurgeDeletedObjects();
 }
 
 void CPlayScene::Render()

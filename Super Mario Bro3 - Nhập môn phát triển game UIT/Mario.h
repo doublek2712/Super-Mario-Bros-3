@@ -8,6 +8,7 @@
 
 #define MARIO_WALKING_SPEED		0.1f
 #define MARIO_RUNNING_SPEED		0.2f
+#define MARIO_PIPE_SPEED		0.05f
 
 #define MARIO_ACCEL_WALK_X	0.0002f
 #define MARIO_ACCEL_RUN_X	0.0007f
@@ -53,6 +54,10 @@
 
 #define MARIO_STATE_TAIL_ATTACK		1000
 
+#define MARIO_STATE_PIPE_ENTRANCE	1101
+#define MARIO_STATE_PIPE_EXIT		1102
+#define MARIO_STATE_UP				1200
+
 #pragma endregion
 
 #pragma region ANIMATION_ID
@@ -92,6 +97,8 @@
 #define	ID_ANI_MARIO_TURN_INTO_SMALL_LEFT	1040
 #define	ID_ANI_MARIO_TURN_INTO_SMALL_RIGHT	1041
 
+#define ID_ANI_MARIO_PIPE	1050
+
 #define ID_ANI_MARIO_DIE 999
 
 // SMALL MARIO
@@ -126,6 +133,8 @@
 
 #define	ID_ANI_MARIO_SMALL_TURN_INTO_BIG_LEFT	1640
 #define	ID_ANI_MARIO_SMALL_TURN_INTO_BIG_RIGHT	1641
+
+#define ID_ANI_MARIO_SMALL_PIPE	1650
 
 // RACCOON MARIO
 #define ID_ANI_MARIO_RACCOON_IDLE_RIGHT 1700
@@ -169,6 +178,8 @@
 #define ID_ANI_MARIO_RACCOON_TAIL_ATTACK_LEFT 2401
 #define ID_ANI_MARIO_RACCOON_TAIL_ATTACK_RIGHT 2402
 
+#define ID_ANI_MARIO_RACCOON_PIPE	2500
+
 #define ID_ANI_MARIO_TURN_INTO_RACCOON	13000
 #define ID_ANI_MARIO_RACCOON_TURN_INTO_BIG	13000
 
@@ -196,6 +207,7 @@
 #define MARIO_KICK_ANI_TIME		300
 #define MARIO_TAIL_ATTACK_TIME	400
 #define MARIO_TRANSFORM_TIME	1000
+#define MARIO_PIPE_TIME	800
 
 class CMario : public CGameObject
 {
@@ -207,25 +219,31 @@ class CMario : public CGameObject
 	int level;
 	int previous_level;
 	int untouchable;
+
 	ULONGLONG untouchable_start;
 	ULONGLONG kick_start;
 	ULONGLONG tail_attack_start;
 	ULONGLONG transform_start;
-
-	BOOLEAN isOnPlatform;
-	int coin;
-
-	BOOLEAN isKicking;
+	ULONGLONG pipe_start;
 
 	BOOLEAN readyToHold;
+	BOOLEAN readyToPipe;
+
+	int pipeDestination;
+	float pipeDestination_x;
+	int pipeDestination_ny;
+	int mapIndex; // -1 is default
+
+	BOOLEAN isOnPlatform;
 	BOOLEAN isHolding;
-
-	CGameObject* koopaShell;
-
+	BOOLEAN isKicking;
 	BOOLEAN isFlying;
 	BOOLEAN isWagging;
 	BOOLEAN isTailAttacking;
 	BOOLEAN isTransform;
+	BOOLEAN isPipe;
+
+	CGameObject* koopaShell;
 
 	void OnCollisionWithFire(LPCOLLISIONEVENT e);
 	void OnCollisionWithSuperLeaf(LPCOLLISIONEVENT e);
@@ -238,6 +256,7 @@ class CMario : public CGameObject
 	void OnCollisionWithKoopa(LPCOLLISIONEVENT e);
 	void OnCollisionWithPButton(LPCOLLISIONEVENT e);
 	void OnCollisionWithBrick(LPCOLLISIONEVENT e);
+	void OnCollisionWithPipe(LPCOLLISIONEVENT e);
 
 	int GetAniIdRaccoon();
 	int GetAniIdBig();
@@ -254,21 +273,31 @@ public:
 
 		level = MARIO_LEVEL_SMALL;
 		previous_level = level;
+
 		untouchable = 0;
-		untouchable_start = -1;
-		kick_start = -1;
-		tail_attack_start = -1;
-		transform_start = -1;
-		isOnPlatform = false;
-		coin = 0;
-		isKicking = FALSE;
+		untouchable_start = 0;
+		kick_start = 0;
+		tail_attack_start = 0;
+		transform_start = 0;
+
 		readyToHold = FALSE;
+		readyToPipe = FALSE;
+
+		pipeDestination = -1;
+		pipeDestination_x = -1;
+		pipeDestination_ny = 0;
+		mapIndex = -1;
+
+		isOnPlatform = FALSE;
+		isKicking = FALSE;
 		isHolding = FALSE;
-		koopaShell = nullptr;
 		isFlying = FALSE;
 		isWagging = FALSE;
 		isTailAttacking = FALSE;
 		isTransform = FALSE;
+		isPipe = FALSE;
+
+		koopaShell = nullptr;
 	}
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	void Render();
@@ -276,7 +305,7 @@ public:
 
 	int IsCollidable()
 	{
-		return (state != MARIO_STATE_DIE);
+		return (state != MARIO_STATE_DIE && !isPipe);
 	}
 
 	int IsBlocking() { return (state != MARIO_STATE_DIE && untouchable == 0); }
@@ -287,10 +316,12 @@ public:
 	void SetLevel(int l);
 	int GetLevel();
 	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount64(); }
-
 	void GetBoundingBox(float& left, float& top, float& right, float& bottom);
-
 	void HitByEnemy();
 
-	int IsFlying() { return isFlying; }
+	BOOLEAN IsFlying() { return isFlying; }
+	BOOLEAN IsPipe() { return isPipe; }
+	
+	int GetPipeDestination() { return pipeDestination;  }
+	int GetMap() { return mapIndex; }
 };

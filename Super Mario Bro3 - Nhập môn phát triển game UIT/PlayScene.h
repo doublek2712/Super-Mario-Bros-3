@@ -7,12 +7,25 @@
 #include "Mario.h"
 #include "Goomba.h"
 #include "BackgroundElement.h"
+#include "Pipe.h"
 
 
 #define PLAY_STATE_PLAYING 0
 #define PLAY_STATE_LOSE 1
 #define PLAY_STATE_WIN	2
 
+
+struct Boundary {
+	int left;
+	int top;
+	int right;
+	int bottom;
+};
+
+struct PipePair {
+	CPipe* entrance;
+	CPipe* exit;
+};
 
 class CPlayScene : public CScene
 {
@@ -22,7 +35,12 @@ protected:
 
 	vector<LPGAMEOBJECT> objects;
 	vector<LPBGELEMENT> background;
-	int b_left, b_right, b_top, b_bottom;
+	vector<PipePair> pipes;
+
+	Boundary currentBoundary;
+
+	Boundary mainBoundary;
+	vector<Boundary> hiddenMapBoundary;
 
 	BOOLEAN isCamYPosAdjust;
 
@@ -33,8 +51,11 @@ protected:
 	void _ParseSection_OBJECTS(string line);
 	void _ParseSection_BACKGROUND(string line);
 	void _ParseSection_BOUNDARIES(string line);
+	void _ParseSection_HIDDENMAPS(string line);
 
 	void LoadAssets(LPCWSTR assetFile);
+
+	void AdjustCamPos();
 
 public:
 	CPlayScene(int id, LPCWSTR filePath);
@@ -47,8 +68,15 @@ public:
 	LPGAMEOBJECT GetPlayer() { return player; }
 
 	void SpawnObject(LPGAMEOBJECT obj);
+
 	BOOLEAN IsFallOff(float obj_y) {
-		return (obj_y >= b_bottom * GRID_SIZE);
+		return (obj_y >= currentBoundary.bottom * GRID_SIZE);
+	}
+
+	CPipe* GetExitPipeWithIndex(int index) { 
+		if(index+1 <= pipes.size())
+			return pipes[index].exit; 
+		return nullptr;
 	}
 
 	void Clear();
