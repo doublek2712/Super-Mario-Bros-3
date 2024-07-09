@@ -147,6 +147,7 @@
     <ClInclude Include="AnimationFrame.h" />
     <ClInclude Include="Animations.h" />
     <ClInclude Include="AssetIDs.h" />
+    <ClInclude Include="AssetLoader.h" />
     <ClInclude Include="BackgroundElement.h" />
     <ClInclude Include="Block.h" />
     <ClInclude Include="BouncingCoin.h" />
@@ -184,6 +185,8 @@
     <ClInclude Include="Utils.h" />
     <ClInclude Include="VenusPiranha.h" />
     <ClInclude Include="Wood.h" />
+    <ClInclude Include="WorldMapKeyHandler.h" />
+    <ClInclude Include="WorldMapScene.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
@@ -218,6 +221,8 @@
     <ClCompile Include="Textures.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="VenusPiranha.cpp" />
+    <ClCompile Include="WorldMapKeyHandler.cpp" />
+    <ClCompile Include="WorldMapScene.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,14 +1,13 @@
 [SETTINGS]
-start	1
+start	2
 width	256
 height	240
 
 #id	type	file
-# type: 0: intro, 1: play scene 
+# type: 0: intro, 1: world map scene, 2: play scene
 [SCENES]
-0	resources\intro.txt
-1	resources\Map1-1.txt
-100	resources\test scene.txt
+1	2	resources\Map1-1.txt
+2	1	resources\WorldMap1.txt
 
 
 # id	file 
@@ -22,3 +21,4 @@ height	240
 50	textures\enemies-custom-4.png
 60	textures\misc-9.png
 70	textures\font.png
+80	textures\world-map.png
