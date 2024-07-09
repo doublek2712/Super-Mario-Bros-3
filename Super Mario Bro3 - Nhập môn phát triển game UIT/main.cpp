@@ -179,6 +179,7 @@ int WINAPI WinMain(
 
 	LPGAME game = CGame::GetInstance();
 	game->Init(hWnd, hInstance);
+	game->InitData();
 	game->InitKeyboard();
 
 

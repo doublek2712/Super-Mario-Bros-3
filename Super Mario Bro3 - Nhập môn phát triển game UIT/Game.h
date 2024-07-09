@@ -12,6 +12,7 @@ using namespace std;
 #include "Texture.h"
 #include "KeyEventHandler.h"
 #include "Scene.h"
+#include "Data.h"
 
 #define MAX_FRAME_RATE 100
 #define KEYBOARD_BUFFER_SIZE 1024
@@ -59,12 +60,17 @@ class CGame
 	int current_scene;
 	int next_scene = -1;
 
+	LPDATA data;
+
 	void _ParseSection_SETTINGS(string line);
 	void _ParseSection_SCENES(string line);
 
 public:
 	// Init DirectX, Sprite Handler
 	void Init(HWND hWnd, HINSTANCE hInstance);
+
+	//Init data
+	void InitData();
 
 	//
 	// Draw a portion or ALL the texture at position (x,y) on the screen. (x,y) is at the CENTER of the image
@@ -117,6 +123,7 @@ public:
 
 	void GetScreenSize(float& w, float& h) { w = screen_width; h = screen_height; }
 
+	LPDATA GetData() { return data; }
 	LPSCENE GetCurrentScene() { return scenes[current_scene]; }
 	void Load(LPCWSTR gameFile);
 	void SwitchScene();

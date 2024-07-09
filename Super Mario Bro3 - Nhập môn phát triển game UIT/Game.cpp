@@ -155,6 +155,10 @@ void CGame::Init(HWND hWnd, HINSTANCE hInstance)
 	return;
 }
 
+void CGame::InitData() {
+	data = new CData();
+}
+
 void CGame::SetPointSamplerState()
 {
 	pD3DDevice->VSSetSamplers(0, 1, &pPointSamplerState);

@@ -162,6 +162,9 @@
     <ClInclude Include="HUD.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
+    <ClInclude Include="Data.h">
+      <Filter>Header Files\Framework of God</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
