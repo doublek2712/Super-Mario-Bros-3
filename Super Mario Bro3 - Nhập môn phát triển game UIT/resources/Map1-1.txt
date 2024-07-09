@@ -14,8 +14,8 @@ resources\bullet.txt
 resources\koopa.txt
 resources\button.txt
 resources\VFX.txt
+resources\UI.txt
 #
-#because the program will render object in the order of loading this file, so first in last stand !!
 [BOUNDARIES]
 #left	top	right	bottom 
 0	-16	175	15
@@ -166,7 +166,7 @@ resources\VFX.txt
 9	116	8	1
 
 # MARIO
-0	2256	-170
+0	100	100
 
 #pipe			
 ##gate : 0 - none, 1 - entrance, 2 - exit

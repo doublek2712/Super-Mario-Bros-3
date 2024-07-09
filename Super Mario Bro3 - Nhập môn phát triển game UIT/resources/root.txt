@@ -10,6 +10,7 @@ height	240
 1	resources\Map1-1.txt
 100	resources\test scene.txt
 
+
 # id	file 
 [TEXTURES]
 -100	textures\bbox.png
@@ -20,3 +21,4 @@ height	240
 40	textures\enemies-custom-5.png
 50	textures\enemies-custom-4.png
 60	textures\misc-9.png
+70	textures\font.png

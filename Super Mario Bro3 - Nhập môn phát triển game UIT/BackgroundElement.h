@@ -21,8 +21,25 @@ public:
 		this->col = col;
 		this->sprite_id = sprite_id;
 	}
+	CBackgroundElement(
+		float x,
+		float y,
+		int row,
+		int col,
+		int sprite_id) {
+		this->x = x;
+		this->y = y;
+		this->row = row;
+		this->col = col;
+		this->sprite_id = sprite_id;
+	}
 
 	void Render();
+	void SetPosition(float x, float y) {
+		this->x = x;
+		this->y = y;
+	}
+	
 };
 
 typedef CBackgroundElement* LPBGELEMENT;

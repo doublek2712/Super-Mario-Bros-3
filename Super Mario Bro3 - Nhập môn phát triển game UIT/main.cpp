@@ -11,6 +11,7 @@
 #include "Textures.h"
 #include "Animation.h"
 #include "Animations.h"
+#include "HUD.h"
 
 #include "Mario.h"
 #include "Block.h"

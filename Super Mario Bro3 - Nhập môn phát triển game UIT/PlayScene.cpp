@@ -3,6 +3,7 @@
 #include "AssetIDs.h"
 #include "Configs.h"
 #include "debug.h"
+#include "HUD.h"
 
 #include "PlayScene.h"
 #include "Utils.h"
@@ -443,6 +444,7 @@ void CPlayScene::Load()
 
 void CPlayScene::Update(DWORD dt)
 {
+	
 	vector<LPGAMEOBJECT> coObjects;
 	for (size_t i = 0; i < objects.size(); i++)
 		if(objects[i] != player)
@@ -457,6 +459,8 @@ void CPlayScene::Update(DWORD dt)
 
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
 	if (player == NULL) return;
+
+	
 	// Update camera to follow mario
 	float cx, cy;
 	player->GetPosition(cx, cy);
@@ -472,6 +476,8 @@ void CPlayScene::Update(DWORD dt)
 
 	
 	AdjustCamPos();
+	//update HUD
+	CHUD::GetInstance()->Update();
 	PurgeDeletedObjects();
 
 	CMario* mario = dynamic_cast<CMario*>(player);
@@ -534,6 +540,7 @@ void CPlayScene::AdjustCamPos()
 		}
 	}
 	CGame::GetInstance()->SetCamPos(cx, cy);
+	DebugOutTitle(L"campos: %f : %f", cx, cy);
 }
 
 void CPlayScene::Render()
@@ -544,6 +551,9 @@ void CPlayScene::Render()
 	// render obj
 	for (int i = 0; i < objects.size(); i++)
 		objects[i]->Render();
+
+	// render HUD
+	CHUD::GetInstance()->Render();
 }
 
 /*
