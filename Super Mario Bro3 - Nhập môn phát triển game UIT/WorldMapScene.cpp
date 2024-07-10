@@ -8,12 +8,16 @@
 #include "debug.h"
 #include "HUD.h"
 #include "AssetLoader.h"
+#include "Utils.h"
+
 
 #define WSCENE_SECTION_UNKNOWN -1
 #define WSCENE_SECTION_ASSETS	1
 #define WSCENE_SECTION_BACKGROUND	2
 #define WSCENE_SECTION_PORTALS	3
 #define WSCENE_SECTION_PATH	4
+#define WSCENE_SECTION_MAP_SETTINGS 5
+#define WSCENE_SECTION_PLAYER	6
 
 #define ASSETS_SECTION_UNKNOWN -1
 #define ASSETS_SECTION_SPRITES 1
@@ -24,6 +28,8 @@
 CWorldMapScene::CWorldMapScene(int id, LPCWSTR filePath) :
 	CScene(id, filePath) {
 	key_handler = new CWorldMapKeyHandler(this);
+	row = 0;
+	col = 0;
 }
 
 void CWorldMapScene::Load()
@@ -46,6 +52,8 @@ void CWorldMapScene::Load()
 		if (line == "[BACKGROUND]") { section = WSCENE_SECTION_BACKGROUND; continue; };
 		if (line == "[PORTALS]") { section = WSCENE_SECTION_PORTALS; continue; };
 		if (line == "[PATH]") { section = WSCENE_SECTION_PATH; continue; };
+		if (line == "[MAP_SETTINGS]") { section = WSCENE_SECTION_MAP_SETTINGS; continue; };
+		if (line == "[PLAYER]") { section = WSCENE_SECTION_PLAYER; continue; };
 		if (line[0] == '[') { section = WSCENE_SECTION_UNKNOWN; continue; }
 
 		//
@@ -57,6 +65,8 @@ void CWorldMapScene::Load()
 		case WSCENE_SECTION_BACKGROUND: _ParseSection_BACKGROUND(line); break;
 		case WSCENE_SECTION_PORTALS: _ParseSection_PORTAL(line); break;
 		case WSCENE_SECTION_PATH: _ParseSection_PATH(line); break;
+		case WSCENE_SECTION_MAP_SETTINGS: _ParseSection_MAP_SETTINGS(line); break;
+		case WSCENE_SECTION_PLAYER: _ParseSection_PLAYER(line); break;
 		}
 	}
 
@@ -100,18 +110,102 @@ void CWorldMapScene::_ParseSection_BACKGROUND(string line) {
 
 	this->background.push_back(element);
 }
-void CWorldMapScene::_ParseSection_PATH(string line) {
+void CWorldMapScene::_ParseSection_PLAYER(string line) {
+
+	vector<string> tokens = split(line);
+
+	if (tokens.size() < 2) return; // skip invalid lines
+
+	float x = atoi(tokens[0].c_str()) + origin_x;
+	float y = atoi(tokens[1].c_str()) + origin_y;
+
+	gridToreal(x, y);
+
+	player = new CMarioOnWorldMap(x, y);
 
 }
+void CWorldMapScene::_ParseSection_MAP_SETTINGS(string line) {
+
+	vector<string> tokens = split(line);
+
+	if (tokens.size() < 2) return; // skip invalid lines
+
+	if (tokens[0] == "ORIGIN")
+	{
+		origin_x = atoi(tokens[1].c_str());
+		origin_y = atoi(tokens[2].c_str());
+	}
+	else if (tokens[0] == "ROW") {
+		row = atoi(tokens[1].c_str());
+	}
+	else if (tokens[0] == "COL") {
+		col = atoi(tokens[1].c_str());
+	}
+
+}
+void CWorldMapScene::_ParseSection_PATH(string line) {
+
+	vector<string> tokens = split(line);
+
+	if (tokens.size() < col) return; // skip invalid lines
+
+	vector<int> newRow;
+	for (int i = 0; i < tokens.size(); i++)
+		newRow.push_back(atoi(tokens[i].c_str()));
+
+	path.push_back(newRow);
+}
 void CWorldMapScene::_ParseSection_PORTAL(string line) {
+	vector<string> tokens = split(line);
+
+	//portal - scene_id
+	if (tokens.size() < 3) return; // skip invalid lines
+
+	if (tokens[0] == "SCENE_ID")
+	{
+		int index = atoi(tokens[1].c_str());
+		int scene_id = atoi(tokens[2].c_str());
+
+		portals[index] = new CPortal(0, 0, index, scene_id);
+
+		return;
+	}
+
+	//portal map
+	if (tokens.size() < col) return; // skip invalid lines
+
+	vector<int> newRow;
+	for (int i = 0; i < tokens.size(); i++)
+	{
+		newRow.push_back(atoi(tokens[i].c_str()));
+		if (newRow[i] != PORTAL_MAP_BLANK && newRow[i] != PORTAL_MAP_START)
+		{
+			float px = i + origin_x;
+			float py = portalMap.size() + origin_y;
+
+			gridToreal(px, py);
+
+			portals[newRow[i]]->SetPosition(px, py);
+		}
+			
+	}
+
+	portalMap.push_back(newRow);
 
 }
 void CWorldMapScene::Update(DWORD dt) {
-
+	player->Update(dt);
 }
 void CWorldMapScene::Render() {
+	//render bg
 	for (int i = 0; i < background.size(); i++)
 		background[i]->Render();
+
+	//render portals
+	for (auto& portal : portals)
+		portal.second->Render();
+
+	player->Render();
 	// render HUD
 	CHUD::GetInstance()->Render();
 }
@@ -123,4 +217,71 @@ void CWorldMapScene::Unload() {
 
 
 	DebugOut(L"[INFO] Scene %d unloaded! \n", id);
+}
+
+void CWorldMapScene::ExploreNextMove(float& x, float& y, int direction) {
+	//
+	int ex, ey;
+	ex = x / GRID_SIZE - origin_x;
+	ey = y / GRID_SIZE - origin_y;
+
+	float xx, yy;
+
+	switch (direction)
+	{
+	case EXPLORE_DIRECTION_LEFT:
+		while (ex > 0 && path[ey][ex - 1] != PATH_TYPE_BLANK)
+		{
+			ex--;
+			if (path[ey][ex] == PATH_TYPE_STOP)
+				break;
+		}
+		break;
+	case EXPLORE_DIRECTION_RIGHT:
+		while (ex < col - 1 && path[ey][ex+1] != PATH_TYPE_BLANK)
+		{
+			ex++;
+			if (path[ey][ex] == PATH_TYPE_STOP)
+				break;
+		}
+		break;
+	case EXPLORE_DIRECTION_UP:
+		while (ey > 0 && path[ey-1][ex] != PATH_TYPE_BLANK)
+		{
+			ey--;
+			if (path[ey][ex] == PATH_TYPE_STOP)
+				break;
+		}
+		break;
+	case EXPLORE_DIRECTION_DOWN:
+		while (ey < row - 1 && path[ey+1][ex] != PATH_TYPE_BLANK)
+		{
+			ey++;
+			if (path[ey][ex] == PATH_TYPE_STOP)
+				break;
+		}
+		break;
+	}
+
+	DebugOut(L"ex:%d, ey:%d\n", ex, ey);
+
+	xx = ex + origin_x;
+	yy = ey + origin_y;
+	gridToreal(xx, yy);
+
+	x = xx;
+	y = yy;
+}
+
+CPortal* CWorldMapScene::GetPortalIfStandingOn(float x, float y)
+{
+	int ex, ey;
+	ex = x / GRID_SIZE - origin_x;
+	ey = y / GRID_SIZE - origin_y;
+
+	// 
+	if (portalMap[ey][ex] != PORTAL_MAP_BLANK && portalMap[ey][ex] != PORTAL_MAP_START)
+		return portals[portalMap[ey][ex]];
+
+	return nullptr;
 }

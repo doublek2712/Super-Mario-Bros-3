@@ -167,6 +167,7 @@
     <ClInclude Include="KeyEventHandler.h" />
     <ClInclude Include="Koopa.h" />
     <ClInclude Include="Mario.h" />
+    <ClInclude Include="MarioOnWorldMap.h" />
     <ClInclude Include="ParaGoomba.h" />
     <ClInclude Include="ParaKoopa.h" />
     <ClInclude Include="PButton.h" />
@@ -205,6 +206,7 @@
     <ClCompile Include="Koopa.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mario.cpp" />
+    <ClCompile Include="MarioOnWorldMap.cpp" />
     <ClCompile Include="ParaGoomba.cpp" />
     <ClCompile Include="ParaKoopa.cpp" />
     <ClCompile Include="PButton.cpp" />

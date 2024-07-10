@@ -166,7 +166,7 @@ resources\UI.txt
 9	116	8	1
 
 # MARIO
-0	100	100
+0	40	160
 
 #pipe			
 ##gate : 0 - none, 1 - entrance, 2 - exit

@@ -540,7 +540,7 @@ void CPlayScene::AdjustCamPos()
 		}
 	}
 	CGame::GetInstance()->SetCamPos(cx, cy);
-	DebugOutTitle(L"campos: %f : %f", cx, cy);
+	
 }
 
 void CPlayScene::Render()

@@ -2,6 +2,7 @@
 [ASSETS]
 resources\background-element.txt
 resources\UI.txt
+resources\mario.txt
 #
 [BACKGROUND]
 #x	y	row	col	id	(type)	(grid/real(1 mean real))
@@ -85,18 +86,61 @@ resources\UI.txt
 #castle
 12	8	1	1	-23001
 12	7	1	1	-23002
-
+13	7	1	1	-1100	2
 #bridge
 9	8	1	1	-24000
+#fortress
+6	6	1	1	-26000
+#spades
+8	6	1	1	-27000
+#mushromm house
+12	4	1	1	-29000
+6	8	1	1	-29000
+#lock door
+4	5	1	1	-28000
+#start
+2	4	1	1	-40000
+
+
+[MAP_SETTINGS]
+# origin point
+ORIGIN	1	2
+ROW	9
+COL	14
 
 [PATH]
-0 0 0 1 1 1 1 1 1 1 1 1 0 0
-0 0 0 1 0 0 0 1 0 0 0 1 0 0
-1 1 1 1 0 0 0 1 1 1 1 1 0 0
-0 0 0 0 0 0 0 1 0 0 0 0 0 0
-0 0 0 1 1 1 1 1 0 0 0 0 0 0
-0 0 0 1 0 0 0 0 0 0 0 0 0 0
-0 0 0 1 0 1 1 1 1 1 1 1 0 0
-0 0 0 1 0 0 0 1 0 0 0 0 0 0
-0 0 0 1 1 1 1 1 0 0 0 0 0 0
+# 0: blank, 1: path, 2: stop station
+0	0	0	2	1	2	1	2	1	2	1	2	0	0
+0	0	0	1	0	0	0	1	0	0	0	1	0	0
+1	2	1	2	0	0	0	2	1	2	1	2	0	0
+0	0	0	0	0	0	0	1	0	0	0	0	0	0
+0	0	0	2	1	2	1	2	0	0	0	0	0	0
+0	0	0	1	0	0	0	0	0	0	0	0	0	0
+0	0	0	2	0	2	1	2	1	2	1	2	0	0
+0	0	0	1	0	0	0	1	0	0	0	0	0	0
+0	0	0	2	1	2	1	2	0	0	0	0	0	0
+
+[PLAYER]
+##note: x, y here are considered based on the coordinates of the map
+#x	y
+1	2
+
 [PORTALS]
+#		portal	scene_id
+SCENE_ID	1	1
+SCENE_ID	2	1
+SCENE_ID	3	1
+SCENE_ID	4	1
+SCENE_ID	5	1
+SCENE_ID	6	1
+# 0: blank, -1: start, 1...n: portal
+0	0	0	1	0	0	0	2	0	3	0	0	0	0
+0	0	0	0	0	0	0	0	0	0	0	0	0	0
+0	-1	0	0	0	0	0	0	0	4	0	0	0	0
+0	0	0	0	0	0	0	0	0	0	0	0	0	0
+0	0	0	0	0	0	0	0	0	0	0	0	0	0
+0	0	0	0	0	0	0	0	0	0	0	0	0	0
+0	0	0	0	0	0	0	0	0	0	0	0	0	0
+0	0	0	0	0	0	0	0	0	0	0	0	0	0
+0	0	0	5	0	0	0	6	0	0	0	0	0	0
+

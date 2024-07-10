@@ -1,6 +1,12 @@
 #pragma once
 
 #include "GameObject.h"
+#include "AssetIDs.h"
+
+#define	PORTAL_STATE_OPEN	100
+#define	PORTAL_STATE_CLOSE	200
+
+
 
 /*
 	Object that triggers scene switching
@@ -8,16 +14,11 @@
 class CPortal : public CGameObject
 {
 	int scene_id;	// target scene to switch to 
-
-	float width;
-	float height;
+	int index;
 public:
-	CPortal(float l, float t, float r, float b, int scene_id);
-	virtual void Render();
-	virtual void GetBoundingBox(float& l, float& t, float& r, float& b);
-
-	void RenderBoundingBox(void);
-
+	CPortal(float x, float y, int index, int scene_id);
+	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom) {};
+	void Render();
 	int GetSceneId() { return scene_id; }
 	int IsBlocking() { return 0; }
 };
