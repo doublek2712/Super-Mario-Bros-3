@@ -180,6 +180,9 @@
     <ClInclude Include="ScoreData.h">
       <Filter>Header Files\Defines</Filter>
     </ClInclude>
+    <ClInclude Include="Portal.h">
+      <Filter>Header Files\Framework of God</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -236,14 +239,8 @@
     <ClCompile Include="PlayScene.cpp">
       <Filter>Source Files\Framework of God</Filter>
     </ClCompile>
-    <ClCompile Include="Portal.h">
-      <Filter>Header Files\Framework of God</Filter>
-    </ClCompile>
     <ClCompile Include="Utils.cpp">
       <Filter>Source Files\Utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="Portal.cpp">
-      <Filter>Source Files\Framework of God</Filter>
     </ClCompile>
     <ClCompile Include="BackgroundElement.cpp">
       <Filter>Source Files\Framework of God</Filter>

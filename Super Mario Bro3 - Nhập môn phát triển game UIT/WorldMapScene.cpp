@@ -10,7 +10,6 @@
 #include "AssetLoader.h"
 #include "Utils.h"
 #include "Data.h"
-#include "Portal.h"
 
 
 #define WSCENE_SECTION_UNKNOWN -1
@@ -176,7 +175,8 @@ void CWorldMapScene::_ParseSection_PORTAL(string line) {
 		int index = atoi(tokens[1].c_str());
 		int scene_id = atoi(tokens[2].c_str());
 
-		portals[index] = new CPortal(0, 0, index, scene_id);
+		if(portals.count(index) == 0)
+			portals[index] = new CPortal(0, 0, index, scene_id);
 
 		return;
 	}

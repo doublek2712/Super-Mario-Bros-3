@@ -8,7 +8,6 @@
 
 #include "Goomba.h"
 #include "Coin.h"
-#include "Portal.h"
 #include "Block.h"
 #include "SuperMushroom.h"
 #include "SuperLeaf.h"
@@ -81,6 +80,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if(!isPipe)
 		vy += ay * dt;
 	vx += ax * dt;
+	CGame::GetInstance()->GetData()->SetSpeed(vx);
 
 	// deceleration to prevent slipping
 	if (ax == 0 && vx != 0) {
@@ -136,8 +136,6 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithGoomba(e);
 	else if (dynamic_cast<CCoin*>(e->obj))
 		OnCollisionWithCoin(e);
-	else if (dynamic_cast<CPortal*>(e->obj))
-		OnCollisionWithPortal(e);
 	else if (dynamic_cast<CBrick*>(e->obj))
 		OnCollisionWithBrick(e);
 	else if (dynamic_cast<CBlock*>(e->obj))
@@ -359,11 +357,6 @@ void CMario::OnCollisionWithCoin(LPCOLLISIONEVENT e)
 	e->obj->Delete();
 }
 
-void CMario::OnCollisionWithPortal(LPCOLLISIONEVENT e)
-{
-	CPortal* p = (CPortal*)e->obj;
-	CGame::GetInstance()->InitiateSwitchScene(p->GetSceneId());
-}
 void CMario::HitByEnemy()
 {
 	if (untouchable == 0)

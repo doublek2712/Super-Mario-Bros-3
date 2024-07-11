@@ -175,6 +175,7 @@
     <ClInclude Include="Platform.h" />
     <ClInclude Include="PlatformChecker.h" />
     <ClInclude Include="PlayScene.h" />
+    <ClInclude Include="Portal.h" />
     <ClInclude Include="SampleKeyEventHandler.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="ScoreData.h" />
@@ -214,8 +215,6 @@
     <ClCompile Include="Pipe.cpp" />
     <ClCompile Include="Platform.cpp" />
     <ClCompile Include="PlayScene.cpp" />
-    <ClCompile Include="Portal.cpp" />
-    <ClCompile Include="Portal.h" />
     <ClCompile Include="SampleKeyEventHandler.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="Sprites.cpp" />

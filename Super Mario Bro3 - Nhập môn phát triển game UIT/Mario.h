@@ -7,8 +7,10 @@
 #include "debug.h"
 
 #define MARIO_WALKING_SPEED		0.1f
-#define MARIO_RUNNING_SPEED		0.2f
+#define MARIO_RUNNING_SPEED		0.19f
 #define MARIO_PIPE_SPEED		0.05f
+
+#define MARIO_RUNNING_SPEED_STEP	0.015
 
 #define MARIO_ACCEL_WALK_X	0.0002f
 #define MARIO_ACCEL_RUN_X	0.0007f
@@ -251,7 +253,6 @@ class CMario : public CGameObject
 	void OnCollisionWithQBlock(LPCOLLISIONEVENT e);
 	void OnCollisionWithGoomba(LPCOLLISIONEVENT e);
 	void OnCollisionWithCoin(LPCOLLISIONEVENT e);
-	void OnCollisionWithPortal(LPCOLLISIONEVENT e);
 	void OnCollisionWithPiranha(LPCOLLISIONEVENT e);
 	void OnCollisionWithKoopa(LPCOLLISIONEVENT e);
 	void OnCollisionWithPButton(LPCOLLISIONEVENT e);

@@ -23,6 +23,7 @@ class CData
 	UINT score;
 	UINT coin;
 	UINT timer;
+	float speed;
 	vector<int> cards;
 
 public:
@@ -32,6 +33,7 @@ public:
 		score = SCORE_DEFAULT;
 		coin = COIN_DEFAULT;
 		timer = TIMER_DEFAULT;
+		speed = 0;
 
 		for (int i = 0; i < CARD_QUANTITY; i++)
 			cards.push_back(CARD_BLANK);
@@ -43,6 +45,7 @@ public:
 	UINT GetScore() { return score; }
 	UINT GetCoin() { return coin; }
 	UINT GetTimer() { return timer; }
+	float GetSpeed() { return speed; }
 	vector<int> GetCards() { return cards; }
 
 	//setter
@@ -51,6 +54,7 @@ public:
 	void SetScore(UINT score) { this->score = score; }
 	void SetCoin(UINT coin) { this->coin = coin; }
 	void SetTimer(UINT timer) { this->timer = timer; }
+	void SetSpeed(float speed) { this->speed = speed; }
 
 	//add
 	void AddCoin(int coin) { this->coin += coin; }
@@ -74,6 +78,7 @@ public:
 		score = SCORE_DEFAULT;
 		coin = COIN_DEFAULT;
 		timer = TIMER_DEFAULT;
+		speed = 0;
 
 		for (int i = 0; i < CARD_QUANTITY; i++)
 			cards.push_back(CARD_BLANK);

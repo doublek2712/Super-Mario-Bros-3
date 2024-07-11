@@ -5,6 +5,8 @@
 #include "AssetIDs.h"
 #include "Sprites.h"
 
+#include "Mario.h"
+
 CHUD* CHUD::__instance = NULL;
 
 CHUD* CHUD::GetInstance() {
@@ -62,7 +64,23 @@ void CHUD::Render() {
 			y + (CARD_HEIGHT / 2 - GRID_SIZE / 2) + PANEL_HEIGHT_BUFFER
 		);
 
-	//render character
+	//render speed panel
+	float speed = data->GetSpeed();
+	for (int i = 0; i < TRIANGLE_MAX_QUANTITY; i++)
+	{
+		if(abs(speed) >= MARIO_WALKING_SPEED + (MARIO_RUNNING_SPEED_STEP * (i+1)))
+			sprires->Get(ID_SPRITE_HUD_TRIANGLE)->Draw(
+				x + PANEL_WIDTH_BUFFER + TRIANGLE_BUFFER_WIDTH - GRID_SIZE / 2 + CHARACTER_SIZE / 2 + CHARACTER_SIZE * i,
+				y + PANEL_HEIGHT_BUFFER + TRIANGLE_BUFFER_HEIGHT - GRID_SIZE / 2 + CHARACTER_SIZE / 2
+			);
+	}
+	if (abs(speed) >= MARIO_RUNNING_SPEED)
+		CAnimations::GetInstance()->Get(ID_ANI_P_BAGDE_FLICKER)->Render(
+			x + PANEL_WIDTH_BUFFER + P_BAGDE_BUFFER_WIDTH - GRID_SIZE / 2 + P_BAGDE_WIDTH / 2 ,
+			y + PANEL_HEIGHT_BUFFER + P_BAGDE_BUFFER_HEIGHT - GRID_SIZE / 2 + P_BAGDE_HEIGHT / 2
+		);
+
+	//render data
 	// 
 	// world
 	sprires->Get(ID_SPRITE_NUMBER + data->GetWorld())->Draw(
