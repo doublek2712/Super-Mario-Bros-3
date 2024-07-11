@@ -258,6 +258,7 @@ class CMario : public CGameObject
 	void OnCollisionWithPButton(LPCOLLISIONEVENT e);
 	void OnCollisionWithBrick(LPCOLLISIONEVENT e);
 	void OnCollisionWithPipe(LPCOLLISIONEVENT e);
+	void OnCollisionWithRouletteCard(LPCOLLISIONEVENT e);
 
 	int GetAniIdRaccoon();
 	int GetAniIdBig();

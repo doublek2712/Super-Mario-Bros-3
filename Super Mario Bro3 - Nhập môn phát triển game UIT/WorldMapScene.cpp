@@ -175,8 +175,7 @@ void CWorldMapScene::_ParseSection_PORTAL(string line) {
 		int index = atoi(tokens[1].c_str());
 		int scene_id = atoi(tokens[2].c_str());
 
-		if(portals.count(index) == 0)
-			portals[index] = new CPortal(0, 0, index, scene_id);
+		portals[index] = new CPortal(0, 0, index, scene_id);
 
 		return;
 	}

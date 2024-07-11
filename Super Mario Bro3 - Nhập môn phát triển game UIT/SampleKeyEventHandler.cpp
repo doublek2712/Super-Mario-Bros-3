@@ -9,7 +9,7 @@
 void CSampleKeyHandler::OnKeyDown(int KeyCode)
 {
 	CPlayScene* scene = (CPlayScene*) CGame::GetInstance()->GetCurrentScene();
-	if (scene->GetState() == PLAY_STATE_LOSE) return;
+	if (scene->GetState() == PLAY_STATE_LOSE || scene->GetState() == PLAY_STATE_WIN) return;
 
 	CMario* mario = (CMario*)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
 
@@ -48,7 +48,7 @@ void CSampleKeyHandler::OnKeyUp(int KeyCode)
 {
 	//DebugOut(L"[INFO] KeyUp: %d\n", KeyCode);
 	CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-	if (scene->GetState() == PLAY_STATE_LOSE) return;
+	if (scene->GetState() == PLAY_STATE_LOSE || scene->GetState() == PLAY_STATE_WIN) return;
 	CMario* mario = (CMario*)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
 	switch (KeyCode)
 	{
@@ -67,7 +67,7 @@ void CSampleKeyHandler::OnKeyUp(int KeyCode)
 void CSampleKeyHandler::KeyState(BYTE* states)
 {
 	CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-	if (scene->GetState() == PLAY_STATE_LOSE) return;
+	if (scene->GetState() == PLAY_STATE_LOSE || scene->GetState() == PLAY_STATE_WIN) return;
 	LPGAME game = CGame::GetInstance();
 	CMario* mario = (CMario*)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
 

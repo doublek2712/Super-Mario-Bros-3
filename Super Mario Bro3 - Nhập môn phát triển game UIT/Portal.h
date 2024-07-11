@@ -26,17 +26,15 @@ public:
 		SetState(PORTAL_STATE_OPEN);
 	}
 	void GetBoundingBox(float& left, float& top, float& right, float& bottom) {};
-	void Render() {
-		{
-			int spriteId = -1;
-			if (state == PORTAL_STATE_OPEN)
-				spriteId = ID_SPRITE_PORTAL_NUMBER - index;
-			else
-				spriteId = ID_SPRITE_PORTAL_PASS;
+	void Render() 
+	{
+		int spriteId = -1;
+		if (state == PORTAL_STATE_OPEN)
+			spriteId = ID_SPRITE_PORTAL_NUMBER - index;
+		else
+			spriteId = ID_SPRITE_PORTAL_PASS;
 
-			CSprites::GetInstance()->Get(spriteId)->Draw(x, y);
-
-		}
+		CSprites::GetInstance()->Get(spriteId)->Draw(x, y);
 	}
 	int GetSceneId() { return scene_id; }
 	int IsBlocking() { return 0; }

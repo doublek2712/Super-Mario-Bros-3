@@ -36,6 +36,8 @@ class CPlayScene : public CScene
 protected:
 	// A play scene has to have player, right? 
 	LPGAMEOBJECT player;
+	// A roulette card - Condition to win
+	LPGAMEOBJECT card; 
 
 	vector<LPGAMEOBJECT> objects;
 	vector<LPBGELEMENT> background;
@@ -68,7 +70,7 @@ protected:
 
 	void AdjustCamPos();
 
-	void SetState(int state);
+	
 
 public:
 	CPlayScene(int id, LPCWSTR filePath);
@@ -81,6 +83,7 @@ public:
 	void Pause();
 	void UnPause();
 
+	void SetState(int state);
 	int GetState() {
 		return state;
 	};

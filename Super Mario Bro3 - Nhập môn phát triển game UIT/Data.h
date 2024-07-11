@@ -1,5 +1,5 @@
 #pragma once
-
+#include "Mario.h"
 
 #define WORLD_DEFAULT	1
 #define LIFE_DEFAULT	4
@@ -18,6 +18,7 @@
 // this class contain all data game
 class CData
 {
+	// HUD data
 	UINT world;
 	UINT life;
 	UINT score;
@@ -26,17 +27,13 @@ class CData
 	float speed;
 	vector<int> cards;
 
+	// general data
+	int player_level;
+	int current_map;
+
 public:
 	CData() {
-		world = WORLD_DEFAULT;
-		life = LIFE_DEFAULT;
-		score = SCORE_DEFAULT;
-		coin = COIN_DEFAULT;
-		timer = TIMER_DEFAULT;
-		speed = 0;
-
-		for (int i = 0; i < CARD_QUANTITY; i++)
-			cards.push_back(CARD_BLANK);
+		ResetData();
 	}
 
 	//getter
@@ -48,6 +45,9 @@ public:
 	float GetSpeed() { return speed; }
 	vector<int> GetCards() { return cards; }
 
+	int GetPlayerLevel() { return player_level; }
+	int GetCurrentMap() { return current_map; }
+
 	//setter
 	void SetWorld(UINT world) { this->world = world; }
 	void SetLife(UINT life) { this->life = life; }
@@ -55,6 +55,9 @@ public:
 	void SetCoin(UINT coin) { this->coin = coin; }
 	void SetTimer(UINT timer) { this->timer = timer; }
 	void SetSpeed(float speed) { this->speed = speed; }
+
+	void SetPlayerLevel(int player_level) { this->player_level = player_level; }
+	void SetCurrentMap(int current_map) { this->current_map = current_map; }
 
 	//add
 	void AddCoin(int coin) { this->coin += coin; }
@@ -82,6 +85,9 @@ public:
 
 		for (int i = 0; i < CARD_QUANTITY; i++)
 			cards.push_back(CARD_BLANK);
+
+		player_level = MARIO_LEVEL_SMALL;
+		current_map = -1; // mean start
 	}
 
 };

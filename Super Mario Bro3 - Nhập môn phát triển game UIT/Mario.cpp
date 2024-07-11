@@ -19,6 +19,7 @@
 #include "Brick.h"
 #include "PButton.h"
 #include "Pipe.h"
+#include "RouletteCard.h"
 
 #include "Collision.h"
 
@@ -100,7 +101,13 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			SetState(MARIO_STATE_RUNNING_LEFT);
 	}
 
-	
+	// if mario fall off the platform
+	CPlayScene* scene = dynamic_cast<CPlayScene*>(CGame::GetInstance()->GetCurrentScene());
+	if (scene->IsFallOff(y) && scene->GetState() != PLAY_STATE_LOSE && !isPipe)
+	{
+		scene->SetState(PLAY_STATE_LOSE);
+		return;
+	}
 
 	isOnPlatform = false;
 	readyToPipe = FALSE;
@@ -154,8 +161,17 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithPButton(e);
 	else if (dynamic_cast<CPipe*>(e->obj))
 		OnCollisionWithPipe(e);
+	else if (dynamic_cast<CRouletteCard*>(e->obj))
+		OnCollisionWithRouletteCard(e);
 }
-
+void CMario::OnCollisionWithRouletteCard(LPCOLLISIONEVENT e) {
+	CRouletteCard* card = dynamic_cast<CRouletteCard*>(e->obj);
+	card->SetState(ROULETTE_CARD_STATE_WAS_COLLECTED);
+	
+	//win the scene
+	CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+	scene->SetState(PLAY_STATE_WIN);
+}
 void CMario::OnCollisionWithPipe(LPCOLLISIONEVENT e)
 {
 	CPipe* pipe = dynamic_cast<CPipe*>(e->obj);
@@ -181,6 +197,7 @@ void CMario::OnCollisionWithPipe(LPCOLLISIONEVENT e)
 	}
 
 }
+
 void CMario::OnCollisionWithBrick(LPCOLLISIONEVENT e)
 {
 	CBrick* brick = dynamic_cast<CBrick*>(e->obj);

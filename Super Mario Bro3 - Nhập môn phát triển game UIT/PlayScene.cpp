@@ -26,6 +26,7 @@
 #include "ParaKoopa.h"
 #include "Brick.h"
 #include "PButton.h"
+#include "RouletteCard.h"
 
 #include "SampleKeyEventHandler.h"
 
@@ -348,6 +349,11 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 		break;
 	}
+	case OBJECT_TYPE_ROULETTE_CARD:
+		gridToreal(x, y);
+		obj = new CRouletteCard(x, y);
+		this->card = obj;
+		break;
 	default:
 		DebugOut(L"[ERROR] Invalid object type: %d\n", object_type);
 		return;
@@ -457,11 +463,24 @@ void CPlayScene::Update(DWORD dt)
 		{
 			CGame::GetInstance()->InitiateSwitchScene(2);
 			CGame::GetInstance()->SwitchScene();
-			return;
 		}
+
+		return;
 	}
-	// skip the rest if timeout or lose
-	if (state == PLAY_STATE_TIMEOUT || state == PLAY_STATE_LOSE ) return;
+	// if win the game
+	if (state == PLAY_STATE_WIN)
+	{
+		player->Update(dt, &coObjects); 
+		card->Update(dt, &coObjects); 
+		if (GetTickCount64() - win_start > DELAY_TIME_WIN)
+		{
+			CGame::GetInstance()->InitiateSwitchScene(2);
+			CGame::GetInstance()->SwitchScene();
+		}
+		return;
+	}
+	// skip the rest if timeout 
+	if (state == PLAY_STATE_TIMEOUT) return;
 	// if scene was paused
 	if (state == PLAY_STATE_PAUSE)
 	{
@@ -500,7 +519,7 @@ void CPlayScene::Update(DWORD dt)
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
 	if (player == NULL) return;
 
-	// Update camera to follow mario
+	// block mario with boundary
 	float cx, cy;
 	player->GetPosition(cx, cy);
 
@@ -666,6 +685,7 @@ void CPlayScene::SpawnObject(LPGAMEOBJECT obj)
 
 void CPlayScene::SetState(int state)
 {
+	this->state = state;
 	switch (state)
 	{
 	case PLAY_STATE_START:
@@ -681,6 +701,10 @@ void CPlayScene::SetState(int state)
 		CGame::GetInstance()->GetData()->AddLife(-1);
 		break;
 	case PLAY_STATE_WIN:
+		player->SetState(MARIO_STATE_WALKING_RIGHT);
+		win_start = GetTickCount64();
+		/*CRouletteCard* c = (CRouletteCard*)card;
+		CGame::GetInstance()->GetData()->AddCard(c->GetCard());*/
 		break;
 	case PLAY_STATE_TIMEOUT:
 		SetState(PLAY_STATE_LOSE);
@@ -688,7 +712,7 @@ void CPlayScene::SetState(int state)
 		break;
 	}
 
-	this->state = state;
+	
 }
 
 void CPlayScene::Pause() {
