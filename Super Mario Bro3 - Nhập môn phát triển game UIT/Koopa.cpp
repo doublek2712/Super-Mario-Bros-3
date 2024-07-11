@@ -10,6 +10,7 @@
 #include "PlayScene.h"
 #include "ParaKoopa.h"
 #include "Brick.h"
+#include "ScoreData.h"
 
 int RelativedPositionOfPlatformChecker(int x, int nx) {
 	return x + nx * (KOOPA_BBOX_WIDTH - 4);
@@ -90,12 +91,14 @@ void CKoopa::OnCollisionWithOtherUnit(LPCOLLISIONEVENT e)
 		else if (dynamic_cast<CGoomba*>(e->obj))
 		{
 			CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
-			goomba->SetState(GOOMBA_STATE_HIT);
+			if(goomba->IsCollidable())
+				goomba->SetState(GOOMBA_STATE_HIT);
 		}
 		else if (dynamic_cast<CKoopa*>(e->obj) )
 		{
 			CKoopa* koopa = dynamic_cast<CKoopa*>(e->obj);
-			koopa->GetHit(nx);
+			if (koopa->IsCollidable())
+				koopa->GetHit(nx);
 		}
 	}
 	
@@ -258,6 +261,8 @@ void CKoopa::SetState(int state)
 		break;
 	case KOOPA_STATE_SHELL_IDLE:
 		vx = 0;
+		//add score
+		CGame::GetInstance()->GetData()->AddScore(SCORE_ENEMY);
 		break;
 	case KOOPA_STATE_SHELL_MOVE:
 		isHeld = FALSE;
@@ -265,6 +270,9 @@ void CKoopa::SetState(int state)
 		m_y = nullptr;
 		m_nx = nullptr;
 		vx = nx*KOOPA_SHELL_MOVE;
+
+		//add score
+		//CGame::GetInstance()->GetData()->AddScore(SCORE_ENEMY);
 		break;
 	case KOOPA_STATE_HELD:
 		isHeld = TRUE;
@@ -274,6 +282,9 @@ void CKoopa::SetState(int state)
 		vx = nx * KOOPA_WALKING_SPEED;
 		isOnPlatform = FALSE;
 		SetState(KOOPA_STATE_SHELL_IDLE_HIT);
+
+		//add score
+		CGame::GetInstance()->GetData()->AddScore(SCORE_ENEMY);
 		break;
 	}
 }

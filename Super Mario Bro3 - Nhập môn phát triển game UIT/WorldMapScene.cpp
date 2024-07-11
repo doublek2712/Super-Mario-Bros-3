@@ -9,6 +9,8 @@
 #include "HUD.h"
 #include "AssetLoader.h"
 #include "Utils.h"
+#include "Data.h"
+#include "Portal.h"
 
 
 #define WSCENE_SECTION_UNKNOWN -1
@@ -30,6 +32,9 @@ CWorldMapScene::CWorldMapScene(int id, LPCWSTR filePath) :
 	key_handler = new CWorldMapKeyHandler(this);
 	row = 0;
 	col = 0;
+	origin_x = 0;
+	origin_y = 0;
+	player = NULL;
 }
 
 void CWorldMapScene::Load()
@@ -73,6 +78,11 @@ void CWorldMapScene::Load()
 	f.close();
 
 	DebugOut(L"[INFO] Done loading scene  %s\n", sceneFilePath);
+
+	//reset camera
+	CGame::GetInstance()->SetCamPos(0, 0);
+	//reset timer
+	CGame::GetInstance()->GetData()->SetTimer(TIMER_DEFAULT);
 }
 void CWorldMapScene::_ParseSection_BACKGROUND(string line) {
 	vector<string> tokens = split(line);
@@ -195,6 +205,9 @@ void CWorldMapScene::_ParseSection_PORTAL(string line) {
 }
 void CWorldMapScene::Update(DWORD dt) {
 	player->Update(dt);
+	for (auto& portal : portals)
+		portal.second->Update(dt);
+	CHUD::GetInstance()->Update();
 }
 void CWorldMapScene::Render() {
 	//render bg
@@ -210,6 +223,21 @@ void CWorldMapScene::Render() {
 	CHUD::GetInstance()->Render();
 }
 void CWorldMapScene::Unload() {
+	//clear background
+	for (int i = 0; i < background.size(); i++)
+		delete	background[i];
+	background.clear();
+
+	//clear path
+	path.clear();
+	//clear portalMap
+	portalMap.clear();
+
+	//clear portal
+	for (auto& portal : portals)
+		delete	portal.second;
+
+	player = NULL;
 	//clear assets
 	CAnimations::GetInstance()->Clear();
 	CSprites::GetInstance()->Clear();

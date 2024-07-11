@@ -1,6 +1,7 @@
 #include "debug.h"
 #include "ParaGoomba.h"
 #include "AssetIDs.h"
+#include "ScoreData.h"
 
 CParaGoomba::CParaGoomba(float x, float y) : CGoomba(x, y)
 {
@@ -110,6 +111,8 @@ void CParaGoomba::SetState(int state)
 		break;
 	case PARAGOOMBA_STATE_NO_WING_WALKING:
 		vx = nx * GOOMBA_WALKING_SPEED;
+		//add score
+		CGame::GetInstance()->GetData()->AddScore(SCORE_ENEMY);
 		break;
 	}
 

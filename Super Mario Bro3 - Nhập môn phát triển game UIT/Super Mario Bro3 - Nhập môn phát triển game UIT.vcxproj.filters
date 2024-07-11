@@ -177,6 +177,9 @@
     <ClInclude Include="MarioOnWorldMap.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
+    <ClInclude Include="ScoreData.h">
+      <Filter>Header Files\Defines</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

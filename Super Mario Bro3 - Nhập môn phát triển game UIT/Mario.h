@@ -206,8 +206,8 @@
 #define MARIO_UNTOUCHABLE_TIME	3000
 #define MARIO_KICK_ANI_TIME		300
 #define MARIO_TAIL_ATTACK_TIME	400
-#define MARIO_TRANSFORM_TIME	1000
-#define MARIO_PIPE_TIME	800
+#define MARIO_TRANSFORM_TIME	600
+#define MARIO_PIPE_TIME			800
 
 class CMario : public CGameObject
 {
@@ -305,7 +305,10 @@ public:
 
 	int IsCollidable()
 	{
-		return (state != MARIO_STATE_DIE && !isPipe);
+		return 
+			(state != MARIO_STATE_DIE) 
+			&& (!isPipe)
+			&& (!isTransform);
 	}
 
 	int IsBlocking() { return (state != MARIO_STATE_DIE && untouchable == 0); }

@@ -53,7 +53,7 @@ public:
 	virtual void SetState(int state);
 	virtual int IsCollidable()
 	{
-		return (state != GOOMBA_STATE_HIT) && isActived;
+		return (state != GOOMBA_STATE_HIT) && (state != GOOMBA_STATE_DIE) && isActived;
 	}
 
 };

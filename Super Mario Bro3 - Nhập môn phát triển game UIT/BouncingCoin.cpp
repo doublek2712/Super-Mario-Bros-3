@@ -1,4 +1,6 @@
 #include "BouncingCoin.h"
+#include "Data.h"
+#include "ScoreData.h"
 
 void CBouncingCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
@@ -18,7 +20,8 @@ void CBouncingCoin::SetState(int state) {
 	switch (state) {
 	case CONTAINED_STATE_ACTIVE:
 		vy = -BOUNCING_COIN_BOUNCE_FORCE;
-
+		CGame::GetInstance()->GetData()->AddCoin(1);
+		CGame::GetInstance()->GetData()->AddScore(SCORE_BOUNCING_COIN);
 		break;
 	}
 

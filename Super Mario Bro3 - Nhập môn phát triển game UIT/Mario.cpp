@@ -3,6 +3,8 @@
 
 #include "Mario.h"
 #include "Game.h"
+#include "Data.h"
+#include "ScoreData.h"
 
 #include "Goomba.h"
 #include "Coin.h"
@@ -24,6 +26,50 @@
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 
+	//// all timer
+	// reset untouchable timer if untouchable time has passed
+	if (untouchable && GetTickCount64() - untouchable_start > MARIO_UNTOUCHABLE_TIME)
+	{
+		untouchable_start = 0;
+		untouchable = 0;
+	}
+	// reset kick timer 
+	if (isKicking && GetTickCount64() - kick_start > MARIO_KICK_ANI_TIME)
+	{
+		kick_start = 0;
+		isKicking = FALSE;
+	}
+	// reset tail attack timer
+	if (isTailAttacking && GetTickCount64() - tail_attack_start > MARIO_TAIL_ATTACK_TIME)
+	{
+		tail_attack_start = 0;
+		isTailAttacking = FALSE;
+	}
+
+	// reset transform timer
+	if (isTransform && GetTickCount64() - transform_start > MARIO_TRANSFORM_TIME) {
+		transform_start = 0;
+		isTransform = FALSE;
+
+		CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		scene->UnPause();
+	}
+
+	// reset pipe timer
+	if (isPipe && GetTickCount64() - pipe_start > MARIO_PIPE_TIME) {
+		if (state == MARIO_STATE_PIPE_ENTRANCE)
+			SetState(MARIO_STATE_PIPE_EXIT);
+		else
+		{
+			pipe_start = 0;
+			isPipe = FALSE;
+		}
+
+	}
+
+	if (isTransform) return; // skip the rest if transforming
+
+	// update
 	if (isOnPlatform)
 	{
 		ay = MARIO_GRAVITY;
@@ -54,42 +100,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			SetState(MARIO_STATE_RUNNING_LEFT);
 	}
 
-	// reset untouchable timer if untouchable time has passed
-	if (untouchable && GetTickCount64() - untouchable_start > MARIO_UNTOUCHABLE_TIME)
-	{
-		untouchable_start = 0;
-		untouchable = 0;
-	}
-	// reset kick timer 
-	if (isKicking && GetTickCount64() - kick_start > MARIO_KICK_ANI_TIME)
-	{
-		kick_start = 0;
-		isKicking = FALSE;
-	}
-	// reset tail attack timer
-	if (isTailAttacking && GetTickCount64() - tail_attack_start > MARIO_TAIL_ATTACK_TIME)
-	{
-		tail_attack_start = 0;
-		isTailAttacking = FALSE;
-	}
-
-	// reset transform timer
-	if (isTransform && GetTickCount64() - transform_start > MARIO_TRANSFORM_TIME) {
-		transform_start = 0;
-		isTransform = FALSE;
-	}
-
-	// reset pipe timer
-	if (isPipe && GetTickCount64() - pipe_start > MARIO_PIPE_TIME) {
-		if (state == MARIO_STATE_PIPE_ENTRANCE)
-			SetState(MARIO_STATE_PIPE_EXIT);
-		else
-		{
-			pipe_start = 0;
-			isPipe = FALSE;
-		}
-
-	}
+	
 
 	isOnPlatform = false;
 	readyToPipe = FALSE;
@@ -273,8 +284,8 @@ void CMario::OnCollisionWithSuperLeaf(LPCOLLISIONEVENT e) {
 	CSuperLeaf* leaf = dynamic_cast<CSuperLeaf*>(e->obj);
 
 	if (leaf->IsCollidable()) {
-		SetLevel(MARIO_LEVEL_RACCOON);
 		leaf->SetState(LEAF_STATE_DIE);
+		SetLevel(MARIO_LEVEL_RACCOON);
 	}
 
 }
@@ -282,8 +293,8 @@ void CMario::OnCollisionWithSuperMushroom(LPCOLLISIONEVENT e) {
 	CSuperMushroom* mushroom = dynamic_cast<CSuperMushroom*>(e->obj);
 
 	if (mushroom->IsCollidable()) {
-		SetLevel(MARIO_LEVEL_BIG);
 		mushroom->SetState(MUSHROOM_STATE_DIE);
+		SetLevel(MARIO_LEVEL_BIG);
 	}
 
 }
@@ -341,6 +352,10 @@ void CMario::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
 void CMario::OnCollisionWithCoin(LPCOLLISIONEVENT e)
 {
 	if (!e->obj->IsCollidable()) return;
+
+	CGame::GetInstance()->GetData()->AddCoin(1);
+	CGame::GetInstance()->GetData()->AddScore(SCORE_COIN);
+
 	e->obj->Delete();
 }
 
@@ -979,10 +994,14 @@ void CMario::SetLevel(int l)
 	{
 		isTransform = TRUE;
 		transform_start = GetTickCount64();
+
+		CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		scene->Pause();
 	}
 
 	previous_level = this->level;
 	level = l;
+
 }
 
 int CMario::GetLevel()

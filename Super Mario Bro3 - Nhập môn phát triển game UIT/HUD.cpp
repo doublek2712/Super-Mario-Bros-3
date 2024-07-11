@@ -45,7 +45,6 @@ void CHUD::Update() {
 void CHUD::Render() {
 	CSprites* sprires = CSprites::GetInstance();
 	CData* data = CGame::GetInstance()->GetData();
-
 	//render bg
 	background->Render();
 

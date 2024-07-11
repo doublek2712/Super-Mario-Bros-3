@@ -1,9 +1,9 @@
 #include "Portal.h"
-#include "Game.h"
 #include "Sprites.h"
 #include "debug.h"
+#include "AssetIDs.h"
 
-CPortal::CPortal(float x, float y,int index, int scene_id) : CGameObject(x, y)
+CPortal::CPortal(float x, float y, int index, int scene_id) : CGameObject(x, y)
 {
 	this->index = index;
 	this->scene_id = scene_id;
@@ -17,7 +17,6 @@ void CPortal::Render()
 	else
 		spriteId = ID_SPRITE_PORTAL_PASS;
 
-	
 	CSprites::GetInstance()->Get(spriteId)->Draw(x, y);
 		
 }

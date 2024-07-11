@@ -40,6 +40,9 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 	player = NULL;
 	key_handler = new CSampleKeyHandler(this);
 	isCamYPosAdjust = FALSE;
+	lose_start = 0;
+	win_start = 0;
+	second_count_start = 0;
 }
 
 
@@ -292,14 +295,6 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		break;
 	}
 
-	//case OBJECT_TYPE_PORTAL:
-	//{
-	//	float r = (float)atof(tokens[3].c_str());
-	//	float b = (float)atof(tokens[4].c_str());
-	//	int scene_id = atoi(tokens[5].c_str());
-	//	obj = new CPortal(x, y, r, b, scene_id);
-	//	break;
-	//}
 	case OBJECT_TYPE_WOOD:
 	{
 		gridToreal(x, y);
@@ -440,16 +435,61 @@ void CPlayScene::Load()
 	f.close();
 
 	DebugOut(L"[INFO] Done loading scene  %s\n", sceneFilePath);
+
+	SetState(PLAY_STATE_START);
 }
 
 void CPlayScene::Update(DWORD dt)
 {
-	
+	// create coObjects vector
 	vector<LPGAMEOBJECT> coObjects;
 	for (size_t i = 0; i < objects.size(); i++)
-		if(objects[i] != player)
+		if (objects[i] != player)
+		{
+			coObjects.push_back(objects[i]);
+		}
+	// if lose the game
+	if (state == PLAY_STATE_LOSE)
 	{
-		coObjects.push_back(objects[i]);
+		player->Update(dt, &coObjects); // update for die animation
+		
+		if (GetTickCount64() - lose_start > DELAY_TIME_LOSE)
+		{
+			CGame::GetInstance()->InitiateSwitchScene(2);
+			CGame::GetInstance()->SwitchScene();
+			return;
+		}
+	}
+	// skip the rest if timeout or lose
+	if (state == PLAY_STATE_TIMEOUT || state == PLAY_STATE_LOSE ) return;
+	// if scene was paused
+	if (state == PLAY_STATE_PAUSE)
+	{
+		PurgeDeletedObjects(); // purge deleted objs before scene was paused
+		player->Update(dt, &coObjects); // update just for timer
+		second_count_start += dt; // update second_count to keep the timer working correctly
+		return;
+	}
+	// update timer
+	if (GetTickCount64() - second_count_start > 1000) // 1s has gone
+	{
+		CGame::GetInstance()->GetData()->AddTimer(-1);
+		// 
+		if (CGame::GetInstance()->GetData()->GetTimer() == 0)
+		{
+			SetState(PLAY_STATE_TIMEOUT);
+			return;
+		}
+		second_count_start = GetTickCount64();
+	}
+
+
+	// update objs
+	if (player->GetState() == MARIO_STATE_DIE)
+	{
+		player->Update(dt, &coObjects);
+		SetState(PLAY_STATE_LOSE);
+		return;
 	}
 
 	for (size_t i = 0; i < objects.size(); i++)
@@ -460,7 +500,6 @@ void CPlayScene::Update(DWORD dt)
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
 	if (player == NULL) return;
 
-	
 	// Update camera to follow mario
 	float cx, cy;
 	player->GetPosition(cx, cy);
@@ -623,4 +662,38 @@ void CPlayScene::PurgeDeletedObjects()
 void CPlayScene::SpawnObject(LPGAMEOBJECT obj) 
 {
 	objects.push_back(obj);
+}
+
+void CPlayScene::SetState(int state)
+{
+	switch (state)
+	{
+	case PLAY_STATE_START:
+		CGame::GetInstance()->GetData()->SetTimer(TIMER_PLAYSCENE);
+		second_count_start = GetTickCount64();
+		break;
+	case PLAY_STATE_PLAYING:
+		break;
+	case PLAY_STATE_PAUSE:
+		break;
+	case PLAY_STATE_LOSE:
+		lose_start = GetTickCount64();
+		CGame::GetInstance()->GetData()->AddLife(-1);
+		break;
+	case PLAY_STATE_WIN:
+		break;
+	case PLAY_STATE_TIMEOUT:
+		SetState(PLAY_STATE_LOSE);
+		return;
+		break;
+	}
+
+	this->state = state;
+}
+
+void CPlayScene::Pause() {
+	SetState(PLAY_STATE_PAUSE);
+}
+void CPlayScene::UnPause() {
+	SetState(PLAY_STATE_PLAYING);
 }

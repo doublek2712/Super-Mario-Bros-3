@@ -6,6 +6,7 @@
 #define SCORE_DEFAULT	0
 #define COIN_DEFAULT	0
 #define TIMER_DEFAULT	0
+#define TIMER_PLAYSCENE	300
 
 #define CARD_QUANTITY	3
 
@@ -50,6 +51,33 @@ public:
 	void SetScore(UINT score) { this->score = score; }
 	void SetCoin(UINT coin) { this->coin = coin; }
 	void SetTimer(UINT timer) { this->timer = timer; }
+
+	//add
+	void AddCoin(int coin) { this->coin += coin; }
+	void AddLife(int life) { this->life += life; }
+	void AddScore(int score) { this->score += score; }
+	void AddTimer(int time) { this->timer += time; }
+	void AddCard(int card)
+	{
+		for(auto i : cards)
+			if (i == CARD_BLANK)
+			{
+				i = card;
+				break;
+			}
+	}
+
+	//reset
+	void ResetData() {
+		world = WORLD_DEFAULT;
+		life = LIFE_DEFAULT;
+		score = SCORE_DEFAULT;
+		coin = COIN_DEFAULT;
+		timer = TIMER_DEFAULT;
+
+		for (int i = 0; i < CARD_QUANTITY; i++)
+			cards.push_back(CARD_BLANK);
+	}
 
 };
 

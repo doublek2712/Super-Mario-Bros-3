@@ -9,11 +9,15 @@
 #include "BackgroundElement.h"
 #include "Pipe.h"
 
+#define PLAY_STATE_START 0
+#define PLAY_STATE_PLAYING 1
+#define PLAY_STATE_PAUSE -1
+#define PLAY_STATE_LOSE 2
+#define PLAY_STATE_WIN	3
+#define PLAY_STATE_TIMEOUT	4
 
-#define PLAY_STATE_PLAYING 0
-#define PLAY_STATE_LOSE 1
-#define PLAY_STATE_WIN	2
-
+#define DELAY_TIME_LOSE	2000
+#define DELAY_TIME_WIN	2000
 
 struct Boundary {
 	int left;
@@ -44,6 +48,13 @@ protected:
 
 	BOOLEAN isCamYPosAdjust;
 
+	int state;
+
+	//timer 
+	ULONGLONG second_count_start;
+	ULONGLONG lose_start;
+	ULONGLONG win_start;
+
 	void _ParseSection_SPRITES(string line);
 	void _ParseSection_ANIMATIONS(string line);
 
@@ -57,6 +68,8 @@ protected:
 
 	void AdjustCamPos();
 
+	void SetState(int state);
+
 public:
 	CPlayScene(int id, LPCWSTR filePath);
 
@@ -64,6 +77,13 @@ public:
 	virtual void Update(DWORD dt);
 	virtual void Render();
 	virtual void Unload();
+
+	void Pause();
+	void UnPause();
+
+	int GetState() {
+		return state;
+	};
 
 	LPGAMEOBJECT GetPlayer() { return player; }
 

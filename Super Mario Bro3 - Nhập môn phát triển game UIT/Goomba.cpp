@@ -2,6 +2,8 @@
 #include "debug.h"
 #include "AssetIDs.h"
 #include "PlayScene.h"
+#include "ScoreData.h"
+
 CGoomba::CGoomba(float x, float y):CGameObject(x, y)
 {
 	this->ax = 0;
@@ -62,6 +64,18 @@ void CGoomba::OnCollisionWith(LPCOLLISIONEVENT e)
 
 void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
+
+	//
+	if ((state == GOOMBA_STATE_DIE) && (GetTickCount64() - die_start > GOOMBA_DIE_TIMEOUT))
+	{
+		isDeleted = true;
+		return;
+	}
+	if ((state == GOOMBA_STATE_HIT) && (GetTickCount64() - die_start > GOOMBA_HIT_TIMEOUT))
+	{
+		isDeleted = true;
+		return;
+	}
 	// preprocessing
 	// process when camera enter , stay or leave
 	if (!CGame::GetInstance()->IsCamEnter(def_x, def_y)) {
@@ -103,17 +117,7 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		return;
 	}
 
-	//
-	if ( (state==GOOMBA_STATE_DIE) && (GetTickCount64() - die_start > GOOMBA_DIE_TIMEOUT) )
-	{
-		isDeleted = true;
-		return;
-	}
-	if ((state == GOOMBA_STATE_HIT) && (GetTickCount64() - die_start > GOOMBA_HIT_TIMEOUT))
-	{
-		isDeleted = true;
-		return;
-	}
+	
 
 	isOnPlatform = FALSE;
 
@@ -151,6 +155,10 @@ void CGoomba::SetState(int state)
 			vx = 0;
 			vy = 0;
 			ay = 0; 
+
+			//add score
+			CGame::GetInstance()->GetData()->AddScore(SCORE_ENEMY);
+
 			break;
 		case GOOMBA_STATE_WALKING: 
 			vx = nx * GOOMBA_WALKING_SPEED;
@@ -158,6 +166,10 @@ void CGoomba::SetState(int state)
 		case GOOMBA_STATE_HIT:
 			die_start = GetTickCount64();
 			vy = -GOOMBA_HIT_DEFLECT_SPEED;
+
+			//add score
+			CGame::GetInstance()->GetData()->AddScore(SCORE_ENEMY);
+
 			break;
 	}
 }

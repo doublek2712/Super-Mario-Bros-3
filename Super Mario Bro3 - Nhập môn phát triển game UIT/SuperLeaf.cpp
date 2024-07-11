@@ -3,6 +3,7 @@
 #include "AssetIDs.h"
 #include "PlayScene.h"
 #include "Mario.h"
+#include "ScoreData.h"
 
 CSuperLeaf::CSuperLeaf(float x, float y, CSuperMushroom* mushroom) :CGameObject(x, y) {
 	this->state = CONTAINED_STATE_DEACTIVE;
@@ -77,9 +78,13 @@ void CSuperLeaf::SetState(int state) {
 			vy = -0.2f;
 			break;
 		}
+		// add score
+		CGame::GetInstance()->GetData()->AddScore(SCORE_POWER_UP);
 		break;
 	}
-
+	case LEAF_STATE_DIE:
+		isDeleted = true;
+		break;
 	}
 	CGameObject::SetState(state);
 }

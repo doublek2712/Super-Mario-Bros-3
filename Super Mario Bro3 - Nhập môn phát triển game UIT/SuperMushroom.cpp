@@ -2,6 +2,7 @@
 #include "AssetIDs.h"
 #include "Mario.h"
 #include "Configs.h"
+#include "ScoreData.h"
 
 #include "debug.h"
 
@@ -86,11 +87,14 @@ void CSuperMushroom::SetState(int state)
 	{
 	case CONTAINED_STATE_ACTIVE:
 		vy = -MUSHROOM_COMEOUT_SPEED;
+		// add score
+		CGame::GetInstance()->GetData()->AddScore(SCORE_POWER_UP);
 		break;
 	case MUSHROOM_STATE_DIE:
 		vx = 0;
 		vy = 0;
 		ay = 0;
+		isDeleted = true;
 		break;
 	case MUSHROOM_STATE_WALKING:
 		vx = -MUSHROOM_WALKING_SPEED;
