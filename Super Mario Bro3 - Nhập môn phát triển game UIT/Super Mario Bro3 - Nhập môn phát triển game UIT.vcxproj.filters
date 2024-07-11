@@ -290,5 +290,8 @@
     <ClCompile Include="RouletteCard.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
+    <ClCompile Include="Data.cpp">
+      <Filter>Source Files\Framework of God</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

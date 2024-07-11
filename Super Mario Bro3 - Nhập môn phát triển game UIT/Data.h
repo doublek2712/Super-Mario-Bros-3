@@ -1,5 +1,7 @@
 #pragma once
-#include "Mario.h"
+#include <Windows.h>
+#include <vector>
+using namespace std;
 
 #define WORLD_DEFAULT	1
 #define LIFE_DEFAULT	4
@@ -75,20 +77,7 @@ public:
 	}
 
 	//reset
-	void ResetData() {
-		world = WORLD_DEFAULT;
-		life = LIFE_DEFAULT;
-		score = SCORE_DEFAULT;
-		coin = COIN_DEFAULT;
-		timer = TIMER_DEFAULT;
-		speed = 0;
-
-		for (int i = 0; i < CARD_QUANTITY; i++)
-			cards.push_back(CARD_BLANK);
-
-		player_level = MARIO_LEVEL_SMALL;
-		current_map = -1; // mean start
-	}
+	void ResetData();
 
 };
 
