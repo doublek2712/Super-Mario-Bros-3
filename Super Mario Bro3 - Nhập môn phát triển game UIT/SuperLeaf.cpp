@@ -78,11 +78,12 @@ void CSuperLeaf::SetState(int state) {
 			vy = -0.2f;
 			break;
 		}
-		// add score
-		CGame::GetInstance()->GetData()->AddScore(SCORE_POWER_UP);
+		
 		break;
 	}
 	case LEAF_STATE_DIE:
+		// add score
+		CGame::GetInstance()->GetData()->AddScore(SCORE_POWER_UP);
 		isDeleted = true;
 		break;
 	}

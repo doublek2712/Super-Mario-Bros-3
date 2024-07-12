@@ -27,6 +27,7 @@
 #include "Brick.h"
 #include "PButton.h"
 #include "RouletteCard.h"
+#include "LifeUpMushroom.h"
 
 #include "SampleKeyEventHandler.h"
 
@@ -202,12 +203,19 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			tmp = new CBouncingCoin(x, y - GRID_SIZE);
 			break;
 		case CONTAIN_SUPER_LEAF:
-			CSuperMushroom* tmp2 = new CSuperMushroom(x, y );
+		{
+			CSuperMushroom* tmp2 = new CSuperMushroom(x, y);
 			objects.push_back(tmp2);
 			tmp = new CSuperLeaf(x, y - GRID_SIZE, tmp2);
 			tmp2 = NULL;
 			delete tmp2;
 			break;
+		}
+		case CONTAIN_1UP_MUSHROOM:
+		{
+			tmp = new CLifeUpMushroom(x, y);
+			break;
+		}
 		}
 		
 		objects.push_back(tmp);
@@ -701,12 +709,18 @@ void CPlayScene::SetState(int state)
 		CGame::GetInstance()->GetData()->AddLife(-1);
 		break;
 	case PLAY_STATE_WIN:
+	{
 		player->SetState(MARIO_STATE_WALKING_RIGHT);
 		win_start = GetTickCount64();
-		CGame::GetInstance()->GetData()->AddCard(((CRouletteCard*)card)->GetCard() + 1);
-		CGame::GetInstance()->GetData()->SetPlayerLevel(((CMario*)player)->GetLevel());
-		CGame::GetInstance()->GetData()->PassCurrentMap();
+		CData* data = CGame::GetInstance()->GetData();
+		CRouletteCard* r_card = (CRouletteCard*)card;
+		CMario* mario = (CMario*)player;
+		data->AddCard(r_card->GetCard() + 1);
+		data->SetPlayerLevel(mario->GetLevel());
+		data->PassCurrentMap();
 		break;
+	}
+		
 	case PLAY_STATE_TIMEOUT:
 		SetState(PLAY_STATE_LOSE);
 		return;

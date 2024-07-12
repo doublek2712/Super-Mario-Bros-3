@@ -88,9 +88,10 @@ void CSuperMushroom::SetState(int state)
 	case CONTAINED_STATE_ACTIVE:
 		vy = -MUSHROOM_COMEOUT_SPEED;
 		// add score
-		CGame::GetInstance()->GetData()->AddScore(SCORE_POWER_UP);
+		
 		break;
 	case MUSHROOM_STATE_DIE:
+		CGame::GetInstance()->GetData()->AddScore(SCORE_POWER_UP);
 		vx = 0;
 		vy = 0;
 		ay = 0;

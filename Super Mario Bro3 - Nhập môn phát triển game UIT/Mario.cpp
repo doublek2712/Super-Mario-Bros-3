@@ -20,6 +20,7 @@
 #include "PButton.h"
 #include "Pipe.h"
 #include "RouletteCard.h"
+#include "LifeUpMushroom.h"
 
 #include "Collision.h"
 
@@ -147,6 +148,8 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithBrick(e);
 	else if (dynamic_cast<CBlock*>(e->obj))
 		OnCollisionWithQBlock(e);
+	else if (dynamic_cast<CLifeUpMushroom*>(e->obj))
+		OnCollisionWithLifeUpMushroom(e);
 	else if (dynamic_cast<CSuperMushroom*>(e->obj))
 		OnCollisionWithSuperMushroom(e);
 	else if (dynamic_cast<CSuperLeaf*>(e->obj))
@@ -163,6 +166,13 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithPipe(e);
 	else if (dynamic_cast<CRouletteCard*>(e->obj))
 		OnCollisionWithRouletteCard(e);
+}
+void CMario::OnCollisionWithLifeUpMushroom(LPCOLLISIONEVENT e) {
+	CLifeUpMushroom* mushroom = dynamic_cast<CLifeUpMushroom*>(e->obj);
+	if (mushroom->IsCollidable()) {
+		mushroom->SetState(MUSHROOM_STATE_DIE);
+		CGame::GetInstance()->GetData()->AddLife(1);
+	}
 }
 void CMario::OnCollisionWithRouletteCard(LPCOLLISIONEVENT e) {
 	CRouletteCard* card = dynamic_cast<CRouletteCard*>(e->obj);
