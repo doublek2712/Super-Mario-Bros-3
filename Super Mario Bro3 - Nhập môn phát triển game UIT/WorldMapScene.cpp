@@ -78,10 +78,7 @@ void CWorldMapScene::Load()
 
 	DebugOut(L"[INFO] Done loading scene  %s\n", sceneFilePath);
 
-	//reset camera
-	CGame::GetInstance()->SetCamPos(0, 0);
-	//reset timer
-	CGame::GetInstance()->GetData()->SetTimer(TIMER_DEFAULT);
+	
 	//set state
 	SetState(WORLD_MAP_STATE_IDLE);
 }
@@ -321,15 +318,25 @@ void CWorldMapScene::SetState(int state) {
 	{
 	case WORLD_MAP_STATE_IDLE:
 	{
-		// 
 		CData* data = CGame::GetInstance()->GetData();
+		//if life == 0
+		if (data->GetLife() == 0)
+		{
+			data->ResetData();
+		}
+		//reset camera
+		CGame::GetInstance()->SetCamPos(0, 0);
+		//reset timer
+		CGame::GetInstance()->GetData()->SetTimer(TIMER_DEFAULT);
+		//set player position
+		
 		if (data->GetCurrentMap() != PORTAL_MAP_START)
 		{
 			float x, y;
 			portals[data->GetCurrentMap()]->GetPosition(x, y);
 			player->SetPosition(x, y);
 		}
-		//
+		//update passed portals
 		for (int i = 1; i <= data->GetPassedMap(); i++)
 			portals[i]->SetState(PORTAL_STATE_CLOSE);
 		break;
@@ -360,6 +367,8 @@ void CWorldMapScene::SetState(int state) {
 		break;
 	}
 	case WORLD_MAP_STATE_RESTART:
+		CData* data = CGame::GetInstance()->GetData();
+		data->ResetData();
 		break;
 	}
 	this->state = state;
