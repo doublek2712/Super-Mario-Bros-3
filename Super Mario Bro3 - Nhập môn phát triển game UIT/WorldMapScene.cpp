@@ -82,6 +82,8 @@ void CWorldMapScene::Load()
 	CGame::GetInstance()->SetCamPos(0, 0);
 	//reset timer
 	CGame::GetInstance()->GetData()->SetTimer(TIMER_DEFAULT);
+	//set state
+	SetState(WORLD_MAP_STATE_IDLE);
 }
 void CWorldMapScene::_ParseSection_BACKGROUND(string line) {
 	vector<string> tokens = split(line);
@@ -300,7 +302,7 @@ void CWorldMapScene::ExploreNextMove(float& x, float& y, int direction) {
 	y = yy;
 }
 
-CPortal* CWorldMapScene::GetPortalIfStandingOn(float x, float y)
+int CWorldMapScene::GetPortalIfStandingOn(float x, float y)
 {
 	int ex, ey;
 	ex = x / GRID_SIZE - origin_x;
@@ -308,7 +310,57 @@ CPortal* CWorldMapScene::GetPortalIfStandingOn(float x, float y)
 
 	// 
 	if (portalMap[ey][ex] != PORTAL_MAP_BLANK && portalMap[ey][ex] != PORTAL_MAP_START)
-		return portals[portalMap[ey][ex]];
+		return portalMap[ey][ex];
 
-	return nullptr;
+	return 0;
+}
+
+void CWorldMapScene::SetState(int state) {
+	
+	switch (state)
+	{
+	case WORLD_MAP_STATE_IDLE:
+	{
+		// 
+		CData* data = CGame::GetInstance()->GetData();
+		if (data->GetCurrentMap() != PORTAL_MAP_START)
+		{
+			float x, y;
+			portals[data->GetCurrentMap()]->GetPosition(x, y);
+			player->SetPosition(x, y);
+		}
+		//
+		for (int i = 1; i <= data->GetPassedMap(); i++)
+			portals[i]->SetState(PORTAL_STATE_CLOSE);
+		break;
+	}
+	case WORLD_MAP_STATE_ENTERING_PORTAL:
+	{
+		float x, y;
+		player->GetPosition(x, y);
+		int p = GetPortalIfStandingOn(x, y);
+
+		if (p > 0)
+		{
+			if (portals[p]->GetState() == PORTAL_STATE_OPEN)
+			{
+				CData* data = CGame::GetInstance()->GetData();
+				data->SetCurrentMap(p);
+				CGame::GetInstance()->InitiateSwitchScene(portals[p]->GetSceneId());
+				CGame::GetInstance()->SwitchScene();
+
+				return;
+			}
+		}
+		else {
+			SetState(WORLD_MAP_STATE_IDLE);
+			return;
+		}
+
+		break;
+	}
+	case WORLD_MAP_STATE_RESTART:
+		break;
+	}
+	this->state = state;
 }

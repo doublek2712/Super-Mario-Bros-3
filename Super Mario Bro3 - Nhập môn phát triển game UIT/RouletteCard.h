@@ -31,5 +31,5 @@ public:
 
 	int IsBlocking() { return 0; }
 
-	int GetCard() { return card;  }
+	int GetCard() { return card + 1;  }
 };

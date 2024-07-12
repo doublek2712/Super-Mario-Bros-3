@@ -8,7 +8,7 @@ CMarioOnWorldMap::CMarioOnWorldMap(float x, float y) {
 	this->stop_y = y;
 	this->vx = 0;
 	this->vy = 0;
-	this->level = MARIO_LVL_SMALL;
+	this->level = CGame::GetInstance()->GetData()->GetPlayerLevel();
 	SetState(MARIO_MAP_STATE_IDLE);
 }
 

@@ -18,6 +18,10 @@
 #define PORTAL_MAP_BLANK	0
 #define	PORTAL_MAP_START	-1
 
+#define WORLD_MAP_STATE_IDLE			100
+#define WORLD_MAP_STATE_ENTERING_PORTAL	200
+#define WORLD_MAP_STATE_RESTART			300
+
 class CWorldMapScene : public CScene
 {
 	CMarioOnWorldMap* player;
@@ -29,6 +33,8 @@ class CWorldMapScene : public CScene
 	int row, col;
 	vector<vector<int>> path;
 	vector<vector<int>> portalMap;
+
+	int state;
 
 	unordered_map<int,CPortal*> portals;
 
@@ -45,8 +51,10 @@ public:
 	virtual void Render();
 	virtual void Unload();
 
+	void SetState(int state);
+
 	CMarioOnWorldMap* GetPlayer() { return player; }
 
 	void ExploreNextMove(float& x, float& y, int direction);
-	CPortal* GetPortalIfStandingOn(float x, float y);
+	int GetPortalIfStandingOn(float x, float y);
 };

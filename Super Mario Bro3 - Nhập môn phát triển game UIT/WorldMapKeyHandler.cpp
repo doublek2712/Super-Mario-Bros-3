@@ -31,15 +31,7 @@ void CWorldMapKeyHandler::OnKeyDown(int KeyCode)
 		break;
 
 	case DIK_S:
-		CPortal* portal = scene->GetPortalIfStandingOn(x, y);
-		if (portal != nullptr)
-		{
-			if (portal->GetState() == PORTAL_STATE_OPEN)
-			{
-				CGame::GetInstance()->InitiateSwitchScene(portal->GetSceneId());
-				CGame::GetInstance()->SwitchScene();
-			}
-		}
+		scene->SetState(WORLD_MAP_STATE_ENTERING_PORTAL);
 		break;
 	}
 

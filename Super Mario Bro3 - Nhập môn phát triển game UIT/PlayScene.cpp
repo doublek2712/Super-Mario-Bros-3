@@ -703,8 +703,9 @@ void CPlayScene::SetState(int state)
 	case PLAY_STATE_WIN:
 		player->SetState(MARIO_STATE_WALKING_RIGHT);
 		win_start = GetTickCount64();
-		/*CRouletteCard* c = (CRouletteCard*)card;
-		CGame::GetInstance()->GetData()->AddCard(c->GetCard());*/
+		CGame::GetInstance()->GetData()->AddCard(((CRouletteCard*)card)->GetCard() + 1);
+		CGame::GetInstance()->GetData()->SetPlayerLevel(((CMario*)player)->GetLevel());
+		CGame::GetInstance()->GetData()->PassCurrentMap();
 		break;
 	case PLAY_STATE_TIMEOUT:
 		SetState(PLAY_STATE_LOSE);

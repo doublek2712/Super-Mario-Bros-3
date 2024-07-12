@@ -39,5 +39,11 @@ public:
 	void Render();
 	void SetState(int state);
 	void GetPosition(float& x, float& y) { x = this->x; y = this->y; };
+	void SetPosition(float x, float y) { 
+		this->x = x; 
+		this->y = y; 
+		this->stop_x = x;
+		this->stop_y = y;
+	}
 	void GoTo(float x, float y);
 };

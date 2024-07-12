@@ -1,5 +1,6 @@
 #include "Data.h"
 #include "Mario.h"
+#include "WorldMapScene.h"
 
 void CData::ResetData() {
 	world = WORLD_DEFAULT;
@@ -13,5 +14,6 @@ void CData::ResetData() {
 		cards.push_back(CARD_BLANK);
 
 	player_level = MARIO_LEVEL_SMALL;
-	current_map = -1; // mean start
+	current_map = PORTAL_MAP_START; // mean start
+	passed_map = PORTAL_MAP_START;
 }

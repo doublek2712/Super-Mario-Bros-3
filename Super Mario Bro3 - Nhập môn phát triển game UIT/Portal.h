@@ -1,7 +1,6 @@
 #pragma once
 
 #include "GameObject.h"
-#include "Portal.h"
 #include "Sprites.h"
 #include "debug.h"
 #include "AssetIDs.h"

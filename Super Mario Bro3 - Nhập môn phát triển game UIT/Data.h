@@ -32,6 +32,7 @@ class CData
 	// general data
 	int player_level;
 	int current_map;
+	int passed_map;
 
 public:
 	CData() {
@@ -49,6 +50,7 @@ public:
 
 	int GetPlayerLevel() { return player_level; }
 	int GetCurrentMap() { return current_map; }
+	int GetPassedMap() { return passed_map;  }
 
 	//setter
 	void SetWorld(UINT world) { this->world = world; }
@@ -60,7 +62,7 @@ public:
 
 	void SetPlayerLevel(int player_level) { this->player_level = player_level; }
 	void SetCurrentMap(int current_map) { this->current_map = current_map; }
-
+	
 	//add
 	void AddCoin(int coin) { this->coin += coin; }
 	void AddLife(int life) { this->life += life; }
@@ -68,12 +70,15 @@ public:
 	void AddTimer(int time) { this->timer += time; }
 	void AddCard(int card)
 	{
-		for(auto i : cards)
-			if (i == CARD_BLANK)
+		for(int i=0; i<cards.size();i++)
+			if (cards[i] == CARD_BLANK)
 			{
-				i = card;
+				cards[i] = card;
 				break;
 			}
+	}
+	void PassCurrentMap() {
+		passed_map = current_map;
 	}
 
 	//reset
