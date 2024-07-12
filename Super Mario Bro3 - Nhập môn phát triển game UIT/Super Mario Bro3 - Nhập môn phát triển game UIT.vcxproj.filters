@@ -189,6 +189,12 @@
     <ClInclude Include="LifeUpMushroom.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
+    <ClInclude Include="Effect.h">
+      <Filter>Header Files\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="Piranha.h">
+      <Filter>Header Files\Game Objects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -298,6 +304,9 @@
     </ClCompile>
     <ClCompile Include="LifeUpMushroom.cpp">
       <Filter>Source Files\Game Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Effect.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

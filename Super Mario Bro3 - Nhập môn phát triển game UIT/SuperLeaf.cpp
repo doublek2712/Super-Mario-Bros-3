@@ -82,6 +82,9 @@ void CSuperLeaf::SetState(int state) {
 		break;
 	}
 	case LEAF_STATE_DIE:
+		// trigger effect
+		CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		scene->SpawnEffect(new CEffect(x, y, SCORE_POWER_UP));
 		// add score
 		CGame::GetInstance()->GetData()->AddScore(SCORE_POWER_UP);
 		isDeleted = true;

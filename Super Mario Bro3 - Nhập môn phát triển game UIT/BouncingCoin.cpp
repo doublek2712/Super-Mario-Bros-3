@@ -1,11 +1,17 @@
 #include "BouncingCoin.h"
 #include "Data.h"
 #include "ScoreData.h"
+#include "PlayScene.h"
+#include "Effect.h"
 
 void CBouncingCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	y += vy * dt;
 	if (y > def_y && vy != 0) {
+		// trigger effect
+		CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		scene->SpawnEffect(new CEffect(x, y, SCORE_BOUNCING_COIN));
+		//
 		y = def_y;
 		vy = 0;
 		isDeleted = true;

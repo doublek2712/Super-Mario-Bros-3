@@ -158,6 +158,7 @@
     <ClInclude Include="Configs.h" />
     <ClInclude Include="Data.h" />
     <ClInclude Include="debug.h" />
+    <ClInclude Include="Effect.h" />
     <ClInclude Include="FireBullet.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
@@ -174,6 +175,7 @@
     <ClInclude Include="ParaKoopa.h" />
     <ClInclude Include="PButton.h" />
     <ClInclude Include="Pipe.h" />
+    <ClInclude Include="Piranha.h" />
     <ClInclude Include="Platform.h" />
     <ClInclude Include="PlatformChecker.h" />
     <ClInclude Include="PlayScene.h" />
@@ -204,6 +206,7 @@
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Data.cpp" />
     <ClCompile Include="debug.cpp" />
+    <ClCompile Include="Effect.cpp" />
     <ClCompile Include="FireBullet.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />

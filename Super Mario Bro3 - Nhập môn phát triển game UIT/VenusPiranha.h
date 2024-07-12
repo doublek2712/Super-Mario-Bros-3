@@ -34,6 +34,11 @@
 #define ID_ANI_VENUS_SHORT_RIGHT_UP 6112
 #define ID_ANI_VENUS_SHORT_RIGHT_DOWN 6111
 
+#define ID_ANI_PIRANHA 6200
+
+#define VENUS_TYPE_VENUS	1
+#define VENUS_TYPE_PIRANHA	2
+
 class CVenusPiranha : public CGameObject
 {
 	float hidden_y, grow_y;
@@ -41,9 +46,10 @@ class CVenusPiranha : public CGameObject
 	ULONGLONG wait_start;
 	ULONGLONG sleep_start;
 	int height;
+	int type;
 
 public:
-	CVenusPiranha(float x, float y, int height): CGameObject(x, y) {
+	CVenusPiranha(float x, float y, int height, int type): CGameObject(x, y) {
 
 		this->state = VENUS_STATE_HIDDEN;
 		this->hidden_y = y ;
@@ -51,6 +57,7 @@ public:
 		this->vx = 0;
 		this->vy = 0;
 		this->height = height;
+		this->type = type;
 		wait_start = -1;
 		sleep_start = -1;
 		isActived = false;

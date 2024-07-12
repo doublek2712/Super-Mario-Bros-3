@@ -3,6 +3,7 @@
 #include "Mario.h"
 #include "Configs.h"
 #include "ScoreData.h"
+#include "PlayScene.h"
 
 #include "debug.h"
 
@@ -91,12 +92,19 @@ void CSuperMushroom::SetState(int state)
 		
 		break;
 	case MUSHROOM_STATE_DIE:
+	{
+		// trigger effect
+		CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		scene->SpawnEffect(new CEffect(x, y, SCORE_POWER_UP));
+		// add score
 		CGame::GetInstance()->GetData()->AddScore(SCORE_POWER_UP);
 		vx = 0;
 		vy = 0;
 		ay = 0;
 		isDeleted = true;
 		break;
+	}
+		
 	case MUSHROOM_STATE_WALKING:
 		vx = -MUSHROOM_WALKING_SPEED;
 		break;

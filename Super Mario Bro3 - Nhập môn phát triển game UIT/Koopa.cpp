@@ -123,7 +123,7 @@ void CKoopa::OnCollisionWithBlock(LPCOLLISIONEVENT e)
 					brick->SetState(BRICK_STATE_HIT);
 		}
 		CBlock* block = dynamic_cast<CBlock*>(e->obj);
-		if(isKicked)
+		if(vx != 0)
 			block->SetState(BLOCK_STATE_COLLIDED_SIDE);
 	}
 	

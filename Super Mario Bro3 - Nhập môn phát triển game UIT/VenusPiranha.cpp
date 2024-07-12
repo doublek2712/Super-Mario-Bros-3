@@ -45,30 +45,34 @@ void CVenusPiranha::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	if (state == VENUS_STATE_FIRE)
 	{
-		CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-		CMario* player = (CMario*)scene->GetPlayer();
-		float px, py;
-		player->GetPosition(px, py);
-		bool face_left = px <= this->x;
-		bool face_up = py <= this->y;
-
-		float vx = (face_left) ? -1 : 1;
-		float vy = (face_up) ? -1 : 1;
-
-		if( (face_left && px >= this->x - VENUS_FIRE_RANGE) ||
-			(!face_left && px <= this->x + VENUS_FIRE_RANGE)
-		)
+		if (type == VENUS_TYPE_VENUS)
 		{
-			vx *= VENUS_FIRE_NEAR;
-			vy *= VENUS_FIRE_NEAR;
+			CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+			CMario* player = (CMario*)scene->GetPlayer();
+			float px, py;
+			player->GetPosition(px, py);
+			bool face_left = px <= this->x;
+			bool face_up = py <= this->y;
+
+			float vx = (face_left) ? -1 : 1;
+			float vy = (face_up) ? -1 : 1;
+
+			if ((face_left && px >= this->x - VENUS_FIRE_RANGE) ||
+				(!face_left && px <= this->x + VENUS_FIRE_RANGE)
+				)
+			{
+				vx *= VENUS_FIRE_NEAR;
+				vy *= VENUS_FIRE_NEAR;
+			}
+			else
+			{
+				vx *= VENUS_FIRE_NEAR;
+				vy *= VENUS_FIRE_FAR;
+			}
+			CFireBullet* fire = new CFireBullet(x, y, vx, vy);
+			scene->SpawnObject(fire);
 		}
-		else 
-		{
-			vx *= VENUS_FIRE_NEAR;
-			vy *= VENUS_FIRE_FAR;
-		}
-		CFireBullet* fire = new CFireBullet(x, y, vx, vy);
-		scene->SpawnObject(fire);
+		
 		SetState(VENUS_STATE_DOWN);
 	}
 		
@@ -102,51 +106,55 @@ void CVenusPiranha::StateHandler()
 
 void CVenusPiranha::Render()
 {
-
-	CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-	CMario* player = (CMario*)scene->GetPlayer();
-	float px, py;
-	player->GetPosition(px, py);
-
-	bool face_left = px <= this->x;
-	bool face_up = py <= this->y;
-
-	if (state == VENUS_STATE_AIMING)
-	{
-		CPlayScene* scene = (CPlayScene*) CGame::GetInstance()->GetCurrentScene();
+	if (type == VENUS_TYPE_VENUS) {
+		CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
 		CMario* player = (CMario*)scene->GetPlayer();
 		float px, py;
 		player->GetPosition(px, py);
 
-		CSprites* sprites = CSprites::GetInstance();
-		int spriteID = -1;
+		bool face_left = px <= this->x;
+		bool face_up = py <= this->y;
 
-		if (face_left) {
-			if (face_up)
-				spriteID = (height>1) ? ID_SPRITE_VENUS_TALL_LEFT_UP_OPEN : ID_SPRITE_VENUS_SHORT_LEFT_UP_OPEN;
-			else 
-				spriteID = (height > 1) ? ID_SPRITE_VENUS_TALL_LEFT_DOWN_OPEN : ID_SPRITE_VENUS_SHORT_LEFT_DOWN_OPEN;
+		if (state == VENUS_STATE_AIMING)
+		{
+			CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+			CMario* player = (CMario*)scene->GetPlayer();
+			float px, py;
+			player->GetPosition(px, py);
+
+			CSprites* sprites = CSprites::GetInstance();
+			int spriteID = -1;
+
+			if (face_left) {
+				if (face_up)
+					spriteID = (height > 1) ? ID_SPRITE_VENUS_TALL_LEFT_UP_OPEN : ID_SPRITE_VENUS_SHORT_LEFT_UP_OPEN;
+				else
+					spriteID = (height > 1) ? ID_SPRITE_VENUS_TALL_LEFT_DOWN_OPEN : ID_SPRITE_VENUS_SHORT_LEFT_DOWN_OPEN;
+			}
+			else
+			{
+				if (face_up)
+					spriteID = (height > 1) ? ID_SPRITE_VENUS_TALL_RIGHT_UP_OPEN : ID_SPRITE_VENUS_SHORT_RIGHT_UP_OPEN;
+				else
+					spriteID = (height > 1) ? ID_SPRITE_VENUS_TALL_RIGHT_DOWN_OPEN : ID_SPRITE_VENUS_SHORT_RIGHT_DOWN_OPEN;
+			}
+
+			sprites->Get(spriteID)->Draw(x, y);
 		}
 		else
 		{
-			if (face_up)
-				spriteID = (height > 1) ? ID_SPRITE_VENUS_TALL_RIGHT_UP_OPEN : ID_SPRITE_VENUS_SHORT_RIGHT_UP_OPEN;
+			CAnimations* s = CAnimations::GetInstance();
+			int aniID = -1;
+			if (face_left)
+				aniID = (height > 1) ? ID_ANI_VENUS_TALL_LEFT_UP : ID_ANI_VENUS_SHORT_LEFT_UP;
 			else
-				spriteID = (height > 1) ? ID_SPRITE_VENUS_TALL_RIGHT_DOWN_OPEN : ID_SPRITE_VENUS_SHORT_RIGHT_DOWN_OPEN;
+				aniID = (height > 1) ? ID_ANI_VENUS_TALL_RIGHT_UP : ID_ANI_VENUS_SHORT_RIGHT_UP;
+			s->Get(aniID)->Render(x, y);
 		}
-
-		sprites->Get(spriteID)->Draw(x, y);
 	}
-	else
-	{
-		CAnimations* s = CAnimations::GetInstance();
-		int aniID = -1;
-		if (face_left)
-			aniID = (height > 1) ? ID_ANI_VENUS_TALL_LEFT_UP : ID_ANI_VENUS_SHORT_LEFT_UP;
-		else
-			aniID = (height > 1) ? ID_ANI_VENUS_TALL_RIGHT_UP : ID_ANI_VENUS_SHORT_RIGHT_UP;
-		s->Get(aniID)->Render(x, y);
-	}
+	else if (type == VENUS_TYPE_PIRANHA)
+		CAnimations::GetInstance()->Get(ID_ANI_PIRANHA)->Render(x, y);
+	
 
 	//RenderBoundingBox();
 }

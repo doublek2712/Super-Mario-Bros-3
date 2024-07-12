@@ -336,8 +336,10 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		int height = atoi(tokens[3].c_str());
 		x += 8; 
 		y += (height > 1)? ( VENUS_BBOX_HEIGHT_TALL - GRID_SIZE ) / 2 : (VENUS_BBOX_HEIGHT_SHORT - GRID_SIZE) / 2;
+
+		int type = atoi(tokens[4].c_str());
 		
-		obj = new CVenusPiranha(x, y, height);
+		obj = new CVenusPiranha(x, y, height, type);
 		break;
 	}
 	case OBJECT_TYPE_KOOPA:
@@ -455,6 +457,9 @@ void CPlayScene::Load()
 
 void CPlayScene::Update(DWORD dt)
 {
+	// always update effect
+	for (int i = 0; i < effects.size(); i++)
+		effects[i]->Update(dt);
 	// create coObjects vector
 	vector<LPGAMEOBJECT> coObjects;
 	for (size_t i = 0; i < objects.size(); i++)
@@ -620,6 +625,10 @@ void CPlayScene::Render()
 
 	// render HUD
 	CHUD::GetInstance()->Render();
+
+	// render effects
+	for (int i = 0; i < effects.size(); i++)
+		effects[i]->Render();
 }
 
 /*
@@ -689,6 +698,10 @@ void CPlayScene::PurgeDeletedObjects()
 void CPlayScene::SpawnObject(LPGAMEOBJECT obj) 
 {
 	objects.push_back(obj);
+}
+void CPlayScene::SpawnEffect(CEffect* eff) 
+{
+	effects.push_back(eff);
 }
 
 void CPlayScene::SetState(int state)

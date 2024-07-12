@@ -8,6 +8,7 @@
 #include "Goomba.h"
 #include "BackgroundElement.h"
 #include "Pipe.h"
+#include "Effect.h"
 
 #define PLAY_STATE_START 0
 #define PLAY_STATE_PLAYING 1
@@ -42,6 +43,7 @@ protected:
 	vector<LPGAMEOBJECT> objects;
 	vector<LPBGELEMENT> background;
 	vector<PipePair> pipes;
+	vector<CEffect*> effects;
 
 	Boundary currentBoundary;
 
@@ -91,6 +93,7 @@ public:
 	LPGAMEOBJECT GetPlayer() { return player; }
 
 	void SpawnObject(LPGAMEOBJECT obj);
+	void SpawnEffect(CEffect* eff);
 
 	BOOLEAN IsFallOff(float obj_y) {
 		return (obj_y >= currentBoundary.bottom * GRID_SIZE);
