@@ -13,7 +13,7 @@
 #include "ScoreData.h"
 
 int RelativedPositionOfPlatformChecker(int x, int nx) {
-	return x + nx * (KOOPA_BBOX_WIDTH - 4);
+	return x + nx * (KOOPA_BBOX_WIDTH);
 }
 
 CKoopa::CKoopa(float x, float y, BOOLEAN block) :CGameObject(x, y)
@@ -26,7 +26,9 @@ CKoopa::CKoopa(float x, float y, BOOLEAN block) :CGameObject(x, y)
 	this->m_y = nullptr;
 	this->isHeld = FALSE;
 	this->isKicked = FALSE;
-
+	this->shell_start = 0;
+	this->shell_vibrate_start = 0;
+	this->shell_coming_out_start = 0;
 	if (block)
 	{
 		platformChecker = new CPlatformChecker(RelativedPositionOfPlatformChecker(x, nx), y, KOOPA_BBOX_HEIGHT, KOOPA_BBOX_WIDTH);
@@ -129,6 +131,23 @@ void CKoopa::OnCollisionWithBlock(LPCOLLISIONEVENT e)
 
 void CKoopa::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	// timer
+	if (state == KOOPA_STATE_SHELL_IDLE && GetTickCount64() - shell_start > KOOPA_SHELL_TIME)
+	{
+		shell_start = 0;
+		SetState(KOOPA_STATE_SHELL_IDLE_VIBRATE);
+	}
+	if (state == KOOPA_STATE_SHELL_IDLE_VIBRATE && GetTickCount64() - shell_vibrate_start > KOOPA_SHELL_VIBRATE_TIME)
+	{
+		shell_vibrate_start = 0;
+		SetState(KOOPA_STATE_SHELL_IDLE_COMING_OUT);
+	}
+	if (state == KOOPA_STATE_SHELL_IDLE_COMING_OUT && GetTickCount64() - shell_coming_out_start > KOOPA_SHELL_COMING_OUT_TIME)
+	{
+		shell_coming_out_start = 0;
+		y = y - (KOOPA_BBOX_HEIGHT - KOOPA_SHELL_BBOX_HEIGHT) / 2;
+		SetState(KOOPA_STATE_WALKING);
+	}
 	// preprocessing
 	// process when camera enter , stay or leave
 	if (!CGame::GetInstance()->IsCamEnter(def_x, def_y)) {
@@ -222,9 +241,12 @@ void CKoopa::Render()
 			state == KOOPA_STATE_HIT ||
 			state == KOOPA_STATE_SHELL_IDLE_HIT)
 			aniId = ID_ANI_KOOPA_RED_SHELL_IDLE;
-		else 
-		if (state == KOOPA_STATE_SHELL_MOVE)
+		else if (state == KOOPA_STATE_SHELL_MOVE)
 			aniId = ID_ANI_KOOPA_RED_SHELL_MOVE;
+		else if (state == KOOPA_STATE_SHELL_IDLE_VIBRATE)
+			aniId = ID_ANI_KOOPA_RED_SHELL_IDLE_VIBRATE;
+		else if (state == KOOPA_STATE_SHELL_IDLE_COMING_OUT)
+			aniId = ID_ANI_KOOPA_RED_SHELL_COMING_OUT;
 	}
 	else
 	{
@@ -234,9 +256,12 @@ void CKoopa::Render()
 			state == KOOPA_STATE_HIT ||
 			state == KOOPA_STATE_SHELL_IDLE_HIT)
 			aniId = ID_ANI_KOOPA_GREEN_SHELL_IDLE;
-		else
-			if (state == KOOPA_STATE_SHELL_MOVE)
-				aniId = ID_ANI_KOOPA_GREEN_SHELL_MOVE;
+		else if (state == KOOPA_STATE_SHELL_MOVE)
+			aniId = ID_ANI_KOOPA_GREEN_SHELL_MOVE;
+		else if (state == KOOPA_STATE_SHELL_IDLE_VIBRATE)
+			aniId = ID_ANI_KOOPA_GREEN_SHELL_IDLE_VIBRATE;
+		else if (state == KOOPA_STATE_SHELL_IDLE_COMING_OUT)
+			aniId = ID_ANI_KOOPA_GREEN_SHELL_COMING_OUT;
 	}
 	
 
@@ -261,8 +286,18 @@ void CKoopa::SetState(int state)
 		break;
 	case KOOPA_STATE_SHELL_IDLE:
 		vx = 0;
+		if(platformChecker != nullptr)
+			platformChecker->SetVx(vx);
+		// 
+		shell_start = GetTickCount64();
 		//add score
 		CGame::GetInstance()->GetData()->AddScore(SCORE_ENEMY);
+		break;
+	case KOOPA_STATE_SHELL_IDLE_VIBRATE:
+		shell_vibrate_start = GetTickCount64();
+		break;
+	case KOOPA_STATE_SHELL_IDLE_COMING_OUT:
+		shell_coming_out_start = GetTickCount64();
 		break;
 	case KOOPA_STATE_SHELL_MOVE:
 		isHeld = FALSE;
